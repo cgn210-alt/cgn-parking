@@ -29,7 +29,7 @@ jobs:
       - name: 실행
         run: node scripts/weekly.js
         env:
-          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_DB_SECRET: ${{ secrets.FIREBASE_DB_SECRET }}
           FIREBASE_DATABASE_URL: https://cgn-parking-default-rtdb.asia-southeast1.firebasedatabase.app
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
           SMTP_PORT: ${{ secrets.SMTP_PORT }}

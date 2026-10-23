@@ -1,7 +1,6 @@
 // 매주 금요일 GitHub Actions 에서 자동 실행
 // 1) 다음 주 신청 일정 만들기  2) 오후 2시 30분 마감 뒤 배정안 만들기  3) 오후 4시 발표 + 결과 메일
 // 실행 시각이 조금 일러도 해당 시각까지 기다렸다가 진행하고, 이미 끝난 단계는 건너뜁니다.
-const admin = require('firebase-admin');
 const nodemailer = require('nodemailer');
 const P = require('../parking-core.js');
 
@@ -12,11 +11,44 @@ async function waitUntil(t) {
   if (ms > 0) { console.log(`${Math.round(ms / 1000)}초 기다림`); await sleep(ms); }
 }
 
-admin.initializeApp({
-  credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)),
-  databaseURL: process.env.FIREBASE_DATABASE_URL,
-});
-const db = admin.database();
+// Firebase 데이터베이스 비밀번호로 REST API 에 접속 (조직 정책으로 서비스 계정 키를 만들 수 없어서 이 방식을 씀)
+// parking-core.js 가 쓰는 ref().once / set / transaction / orderByKey().startAt().endAt() 만 흉내 냄
+const DB_URL = process.env.FIREBASE_DATABASE_URL.replace(/\/$/, '');
+const SECRET = process.env.FIREBASE_DB_SECRET;
+function url(path, q) {
+  const u = new URL(`${DB_URL}/${path}.json`);
+  u.searchParams.set('auth', SECRET);
+  Object.entries(q || {}).forEach(([k, v]) => u.searchParams.set(k, JSON.stringify(v)));
+  return u;
+}
+async function req(method, path, body, headers, q) {
+  const res = await fetch(url(path, q), { method, headers: Object.assign({ 'Content-Type': 'application/json' }, headers), body: body === undefined ? undefined : JSON.stringify(body) });
+  if (res.status === 412) return { conflict: true };
+  if (!res.ok) throw new Error(`${method} ${path} → ${res.status} ${await res.text()}`);
+  return { data: await res.json(), etag: res.headers.get('etag') };
+}
+const snap = (v) => ({ val: () => v });
+function ref(path, q) {
+  return {
+    orderByKey: () => ref(path, Object.assign({}, q, { orderBy: '$key' })),
+    startAt: (v) => ref(path, Object.assign({}, q, { startAt: v })),
+    endAt: (v) => ref(path, Object.assign({}, q, { endAt: v })),
+    once: async () => snap((await req('GET', path, undefined, {}, q)).data),
+    set: async (v) => { await req('PUT', path, v); },
+    // 읽은 뒤 바뀌지 않았을 때만 쓰기 (ETag), 그사이 바뀌었으면 다시 읽어서 재시도
+    transaction: async (fn) => {
+      for (let i = 0; i < 10; i++) {
+        const cur = await req('GET', path, undefined, { 'X-Firebase-ETag': 'true' });
+        const next = fn(cur.data);
+        if (next === undefined) return { committed: false };
+        const r = await req('PUT', path, next, { 'if-match': cur.etag });
+        if (!r.conflict) return { committed: true };
+      }
+      throw new Error('transaction 재시도 초과: ' + path);
+    },
+  };
+}
+const db = { ref: (path) => ref(path) };
 const get = async (path) => (await P.ref(db, path).once('value')).val();
 
 async function main() {
