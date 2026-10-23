@@ -42,12 +42,18 @@
     .summary b { color:var(--text-primary); }
     .toolbar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:10px; }
     .toolbar .input { width:auto; flex:1; min-width:140px; }
-    .user { display:grid; grid-template-columns:1fr auto; gap:6px 10px; padding:10px 0; border-top:1px solid var(--border); align-items:center; }
+    .user { display:flex; flex-wrap:wrap; gap:8px 10px; padding:10px 0; border-top:1px solid var(--border); align-items:center; }
+    .user > div:first-child { flex:1 1 220px; min-width:0; }
     .user:first-child { border-top:none; }
     .user.pending { background:var(--accent-bg); margin:0 -14px; padding:10px 14px; }
-    .u-name { font-size:14px; font-weight:500; }
+    .u-name { font-size:14px; font-weight:500; word-break:keep-all; }
     .u-sub { font-size:12px; color:var(--text-muted); margin-top:2px; word-break:break-all; }
     .u-ctrl { display:flex; gap:6px; align-items:center; flex-wrap:wrap; justify-content:flex-end; }
+    @media (max-width:600px) {
+      .u-ctrl { width:100%; justify-content:flex-start; gap:5px; }
+      .u-ctrl .btn, .u-ctrl select { padding:6px 8px; font-size:12.5px; }
+      .tabs .btn { padding:7px 4px; font-size:12.5px; }
+    }
     .u-ctrl select { font-family:var(--font); font-size:13px; padding:6px 8px; border:1px solid var(--border); border-radius:8px; background:var(--surface-sub); }
     .chk { font-size:12.5px; display:flex; align-items:center; gap:4px; color:var(--text-secondary); }
     .lot-title { font-size:13px; font-weight:700; margin:14px 0 6px; display:flex; justify-content:space-between; }
