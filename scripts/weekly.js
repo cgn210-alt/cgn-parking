@@ -74,16 +74,35 @@ async function main() {
   await sendMails(wk);
 }
 
-async function sendMails(wk) {
-  const week = await get('weeks/' + wk);
-  if (!week || !week.publishedAt) return console.log('발표 전이라 메일을 보내지 않음');
-  if (!process.env.SMTP_HOST) return console.log('SMTP 설정이 없어 메일을 보내지 않음');
-  const tr = nodemailer.createTransport({
+function transport() {
+  return nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: +(process.env.SMTP_PORT || 587),
     secure: +(process.env.SMTP_PORT || 587) === 465,
     auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
   });
+}
+
+// 수동 실행에서 test-mail 을 고르면: 배정은 건드리지 않고 시험 메일 한 통만 보냄
+async function testMail() {
+  if (!process.env.SMTP_HOST) throw new Error('SMTP_HOST 가 없습니다');
+  const tr = transport();
+  await tr.verify();
+  console.log('메일 서버 로그인 성공');
+  const info = await tr.sendMail({
+    from: process.env.MAIL_FROM || process.env.SMTP_USER,
+    to: process.env.TEST_TO,
+    subject: '[CGN 주차] 시험 메일',
+    text: '주차 배정 결과 메일 발송 시험입니다.\n이 메일이 보이면 금요일 오후 4시 결과 메일도 같은 방법으로 발송됩니다.\n\n' + APP_URL,
+  });
+  console.log(`시험 메일 발송: ${process.env.TEST_TO} (${info.response})`);
+}
+
+async function sendMails(wk) {
+  const week = await get('weeks/' + wk);
+  if (!week || !week.publishedAt) return console.log('발표 전이라 메일을 보내지 않음');
+  if (!process.env.SMTP_HOST) return console.log('SMTP 설정이 없어 메일을 보내지 않음');
+  const tr = transport();
   const users = (await get('users')) || {};
   const apps = (await get('apps/' + wk)) || {};
   const dates = Object.keys(week.days || {}).sort();
@@ -124,4 +143,4 @@ async function sendMails(wk) {
   console.log(`메일 ${sent}통 발송`);
 }
 
-main().then(() => process.exit(0), (e) => { console.error(e); process.exit(1); });
+(process.env.MODE === 'test-mail' ? testMail() : main()).then(() => process.exit(0), (e) => { console.error(e); process.exit(1); });

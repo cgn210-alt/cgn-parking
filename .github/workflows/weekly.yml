@@ -9,6 +9,12 @@ on:
     - cron: '30 6 * * 5'   # 15:30 시작 → 16:00 발표 + 결과 메일
     - cron: '0 8 * * 5'    # 17:00 놓친 단계·메일 다시 확인
   workflow_dispatch:
+    inputs:
+      mode:
+        description: '실행 방식 (auto: 평소처럼 진행, test-mail: 마스터에게 시험 메일 한 통만 발송)'
+        type: choice
+        options: [auto, test-mail]
+        default: auto
 
 concurrency:
   group: weekly-parking
@@ -36,3 +42,5 @@ jobs:
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
           MAIL_FROM: ${{ secrets.MAIL_FROM }}
+          MODE: ${{ inputs.mode || 'auto' }}
+          TEST_TO: cgn210@cgnmail.net
