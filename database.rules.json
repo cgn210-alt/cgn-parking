@@ -16,24 +16,61 @@
           "priority": {
             ".write": "auth != null && root.child('parking/admins').child(auth.uid).child('perms/priority').val() === true"
           },
+          "groupReq": {
+            "$ym": {
+              ".write": "auth != null && ((auth.uid === $uid && data.parent().parent().child('approved').val() === true) || root.child('parking/admins').child(auth.uid).child('perms/users').val() === true)"
+            }
+          },
           "$field": {
             ".write": "auth != null && root.child('parking/admins').child(auth.uid).child('perms/users').val() === true"
           }
         }
       },
-      "requests": {
+      "weeks": {
         ".read": "auth != null && ((auth.token.email === 'cgn210@cgnmail.net' && auth.token.email_verified === true) || root.child('parking/admins').child(auth.uid).exists() || root.child('parking/users').child(auth.uid).child('approved').val() === true)",
-        "$date": {
-          "$uid": {
-            ".write": "auth != null && ((auth.token.email === 'cgn210@cgnmail.net' && auth.token.email_verified === true) || root.child('parking/admins').child(auth.uid).child('perms/day').val() === true || (auth.uid === $uid && root.child('parking/users').child(auth.uid).child('approved').val() === true && !root.child('parking/days').child($date).child('finalized').exists()))",
-            ".validate": "newData.isNumber()"
+        "$wk": {
+          ".write": "auth != null && ((auth.token.email === 'cgn210@cgnmail.net' && auth.token.email_verified === true) || root.child('parking/admins').child(auth.uid).child('perms/day').val() === true || (root.child('parking/users').child(auth.uid).child('approved').val() === true && !data.exists() && newData.child('closeAt').val() - newData.child('openAt').val() === 1800000 && newData.child('publishAt').val() - newData.child('closeAt').val() === 5400000))",
+          "publishedAt": {
+            ".write": "auth != null && root.child('parking/users').child(auth.uid).child('approved').val() === true && now >= data.parent().child('publishAt').val()"
           }
+        }
+      },
+      "apps": {
+        ".read": "auth != null && ((auth.token.email === 'cgn210@cgnmail.net' && auth.token.email_verified === true) || root.child('parking/admins').child(auth.uid).exists() || root.child('parking/users').child(auth.uid).child('approved').val() === true)",
+        "$wk": {
+          "$uid": {
+            ".write": "auth != null && ((auth.token.email === 'cgn210@cgnmail.net' && auth.token.email_verified === true) || root.child('parking/admins').child(auth.uid).child('perms/day').val() === true || (auth.uid === $uid && root.child('parking/users').child(auth.uid).child('approved').val() === true && now >= root.child('parking/weeks').child($wk).child('openAt').val() && now <= root.child('parking/weeks').child($wk).child('closeAt').val()))"
+          }
+        }
+      },
+      "drafts": {
+        "$wk": {
+          ".read": "auth != null && ((auth.token.email === 'cgn210@cgnmail.net' && auth.token.email_verified === true) || root.child('parking/admins').child(auth.uid).child('perms/day').val() === true || (root.child('parking/users').child(auth.uid).child('approved').val() === true && now >= root.child('parking/weeks').child($wk).child('publishAt').val()))",
+          ".write": "auth != null && ((auth.token.email === 'cgn210@cgnmail.net' && auth.token.email_verified === true) || root.child('parking/admins').child(auth.uid).child('perms/day').val() === true || (root.child('parking/users').child(auth.uid).child('approved').val() === true && !data.exists() && now >= root.child('parking/weeks').child($wk).child('publishAt').val()))"
         }
       },
       "days": {
         ".read": "auth != null && ((auth.token.email === 'cgn210@cgnmail.net' && auth.token.email_verified === true) || root.child('parking/admins').child(auth.uid).exists() || root.child('parking/users').child(auth.uid).child('approved').val() === true)",
         "$date": {
           ".write": "auth != null && ((auth.token.email === 'cgn210@cgnmail.net' && auth.token.email_verified === true) || root.child('parking/admins').child(auth.uid).child('perms/day').val() === true || root.child('parking/users').child(auth.uid).child('approved').val() === true)"
+        }
+      },
+      "waivers": {
+        ".read": "auth != null && ((auth.token.email === 'cgn210@cgnmail.net' && auth.token.email_verified === true) || root.child('parking/admins').child(auth.uid).exists() || root.child('parking/users').child(auth.uid).child('approved').val() === true)",
+        "$date": {
+          ".write": "auth != null && ((auth.token.email === 'cgn210@cgnmail.net' && auth.token.email_verified === true) || root.child('parking/admins').child(auth.uid).child('perms/day').val() === true)"
+        }
+      },
+      "holidays": {
+        ".read": "auth != null",
+        "$date": {
+          ".write": "auth != null && ((auth.token.email === 'cgn210@cgnmail.net' && auth.token.email_verified === true) || root.child('parking/admins').child(auth.uid).child('perms/day').val() === true)"
+        }
+      },
+      "notices": {
+        ".read": "auth != null",
+        "$id": {
+          ".write": "auth != null && ((auth.token.email === 'cgn210@cgnmail.net' && auth.token.email_verified === true) || root.child('parking/admins').child(auth.uid).child('perms/notice').val() === true)"
         }
       }
     }

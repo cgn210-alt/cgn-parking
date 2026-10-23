@@ -17,29 +17,33 @@
       --danger:#9c1a1a; --font:'Noto Sans KR',sans-serif;
     }
     body { font-family:var(--font); background:var(--bg); color:var(--text-primary); min-height:100vh; -webkit-font-smoothing:antialiased; }
-    .wrap { max-width:760px; margin:0 auto; padding-bottom:40px; }
+    .wrap { max-width:820px; margin:0 auto; padding-bottom:40px; }
     .center { display:flex; align-items:center; justify-content:center; min-height:100vh; padding:24px 16px; }
     .card-box { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:28px 24px; width:100%; max-width:340px; text-align:center; }
     .box-title { font-size:18px; font-weight:700; margin-bottom:6px; }
     .box-sub { font-size:12.5px; color:var(--text-muted); margin-bottom:20px; line-height:1.6; }
     .input { width:100%; font-family:var(--font); font-size:14px; background:var(--surface-sub); border:1px solid var(--border); border-radius:8px; padding:9px 12px; outline:none; }
     .input:focus { border-color:var(--accent); }
+    textarea.input { min-height:110px; line-height:1.6; resize:vertical; }
     .card-box .input { margin-bottom:8px; font-size:15px; padding:11px 14px; }
     .btn { font-family:var(--font); font-size:13px; font-weight:500; border-radius:8px; padding:7px 12px; cursor:pointer; border:1px solid var(--border); background:var(--surface-sub); color:var(--text-primary); white-space:nowrap; }
     .btn-primary { background:var(--accent); border-color:var(--accent); color:#fff; }
     .btn-block { width:100%; padding:11px; font-size:14px; }
     .btn-on { background:var(--accent-bg); border-color:var(--accent); color:var(--accent); font-weight:700; }
     .btn-danger { color:var(--danger); }
+    .btn:disabled { opacity:0.45; cursor:default; }
     .msg { font-size:12.5px; color:var(--danger); margin-top:10px; }
     .header { background:var(--surface); border-bottom:1px solid var(--border); padding:14px 16px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:10; }
     .header-title { font-size:15px; font-weight:700; }
     .header-sub { font-size:11.5px; color:var(--text-muted); margin-top:2px; }
-    .tabs { display:flex; gap:6px; padding:12px 16px 0; }
-    .tabs .btn { flex:1; }
+    .tabs { display:flex; flex-wrap:wrap; gap:6px; padding:12px 16px 0; }
+    .tabs .btn { flex:1 1 auto; min-width:64px; }
     .section { padding:12px 16px 0; }
     .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px; margin-bottom:10px; }
     .summary { font-size:13px; color:var(--text-secondary); line-height:1.7; }
     .summary b { color:var(--text-primary); }
+    .note { font-size:12px; color:var(--text-muted); line-height:1.6; margin-top:6px; }
+    .warn { color:var(--danger); font-weight:700; }
     .toolbar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:10px; }
     .toolbar .input { width:auto; flex:1; min-width:140px; }
     .user { display:flex; flex-wrap:wrap; gap:8px 10px; padding:10px 0; border-top:1px solid var(--border); align-items:center; }
@@ -49,32 +53,49 @@
     .u-name { font-size:14px; font-weight:500; word-break:keep-all; }
     .u-sub { font-size:12px; color:var(--text-muted); margin-top:2px; word-break:break-all; }
     .u-ctrl { display:flex; gap:6px; align-items:center; flex-wrap:wrap; justify-content:flex-end; }
-    @media (max-width:600px) {
-      .u-ctrl { width:100%; justify-content:flex-start; gap:5px; }
-      .u-ctrl .btn, .u-ctrl select { padding:6px 8px; font-size:12.5px; }
-      .tabs .btn { padding:7px 4px; font-size:12.5px; }
-    }
-    .u-ctrl select { font-family:var(--font); font-size:13px; padding:6px 8px; border:1px solid var(--border); border-radius:8px; background:var(--surface-sub); }
+    .u-ctrl select, select.input { font-family:var(--font); font-size:13px; padding:6px 8px; border:1px solid var(--border); border-radius:8px; background:var(--surface-sub); }
     .chk { font-size:12.5px; display:flex; align-items:center; gap:4px; color:var(--text-secondary); }
     .lot-title { font-size:13px; font-weight:700; margin:14px 0 6px; display:flex; justify-content:space-between; }
     .lot-title:first-child { margin-top:0; }
     .lot-title.annex { color:var(--annex); } .lot-title.nam { color:var(--nam); } .lot-title.wait { color:var(--wait); }
+    .lot-title .over { color:var(--danger); }
     .row { display:flex; align-items:center; gap:8px; font-size:13px; padding:6px 0; border-top:1px solid var(--surface-sub); flex-wrap:wrap; }
     .row .no { width:22px; color:var(--text-muted); font-size:12px; }
     .row .nm { flex:1; min-width:90px; }
     .row .pl { color:var(--text-secondary); font-size:12.5px; }
-    .badge { font-size:11px; padding:2px 7px; border-radius:10px; background:var(--surface-sub); color:var(--text-muted); }
+    .row .btn { font-size:11.5px; padding:4px 8px; }
+    .row select { font-size:12px; padding:4px 6px; }
+    .row.me { background:var(--accent-bg); }
+    .badge { font-size:11px; padding:2px 7px; border-radius:10px; background:var(--surface-sub); color:var(--text-muted); white-space:nowrap; }
     .badge.in { background:var(--nam-bg); color:var(--nam); }
     .badge.off { text-decoration:line-through; }
-    .row .btn { font-size:11.5px; padding:4px 8px; }
+    .badge.pin { background:var(--accent-bg); color:var(--accent); }
     .empty { font-size:12.5px; color:var(--text-muted); padding:6px 0; }
-    table { width:100%; border-collapse:collapse; font-size:13px; }
-    th, td { text-align:left; padding:7px 6px; border-top:1px solid var(--border); }
-    th { font-size:12px; color:var(--text-muted); font-weight:500; border-top:none; }
-    td.num { text-align:right; font-variant-numeric:tabular-nums; }
+    .mystat { display:grid; grid-template-columns:repeat(3, 1fr); gap:6px; margin:8px 0; }
+    .mystat > div { background:var(--surface-sub); border-radius:8px; padding:8px; text-align:center; }
+    .mystat .k { font-size:11.5px; color:var(--text-muted); } .mystat .v { font-size:16px; font-weight:700; }
+    .tbl { overflow-x:auto; margin-bottom:6px; }
+    table { width:100%; border-collapse:collapse; font-size:12.5px; white-space:nowrap; }
+    th, td { text-align:left; padding:6px 5px; border-top:1px solid var(--border); }
+    th { font-size:11.5px; color:var(--text-muted); font-weight:500; border-top:none; }
+    td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; }
+    tr.me td { background:var(--accent-bg); }
+    .notice { padding:12px 0; border-top:1px solid var(--border); }
+    .notice:first-child { border-top:none; padding-top:0; }
+    .n-title { font-size:14px; font-weight:700; margin-bottom:4px; }
+    .n-body { font-size:13px; color:var(--text-secondary); line-height:1.65; }
+    .n-meta { font-size:11px; color:var(--text-muted); margin-top:6px; display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+    .day-block { border-top:2px solid var(--border); padding-top:10px; margin-top:12px; }
+    .day-block:first-child { border-top:none; margin-top:0; padding-top:0; }
+    .day-block h4 { font-size:14px; margin-bottom:4px; }
     .toast { position:fixed; top:70px; left:50%; transform:translateX(-50%) translateY(-10px); background:#1a1916; color:#fff; font-size:13px; padding:10px 20px; border-radius:20px; opacity:0; transition:opacity 0.2s, transform 0.2s; z-index:100; pointer-events:none; }
     .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
     .hidden { display:none !important; }
+    @media (max-width:600px) {
+      .u-ctrl { width:100%; justify-content:flex-start; gap:5px; }
+      .u-ctrl .btn, .u-ctrl select { padding:6px 8px; font-size:12.5px; }
+      .tabs .btn { padding:7px 4px; font-size:12.5px; min-width:22%; }
+    }
   </style>
 </head>
 <body>
@@ -116,23 +137,17 @@
   </div>
   <div class="tabs">
     <button class="btn" id="tab-users" onclick="setTab('users')">직원</button>
-    <button class="btn" id="tab-day" onclick="setTab('day')">일자별 현황</button>
-    <button class="btn" id="tab-stats" onclick="setTab('stats')">월별 통계</button>
+    <button class="btn" id="tab-group" onclick="setTab('group')">월별 그룹</button>
+    <button class="btn" id="tab-week" onclick="setTab('week')">주간 배정</button>
+    <button class="btn" id="tab-day" onclick="setTab('day')">일자별</button>
+    <button class="btn" id="tab-stats" onclick="setTab('stats')">통계</button>
+    <button class="btn" id="tab-notice" onclick="setTab('notice')">공지</button>
+    <button class="btn" id="tab-holiday" onclick="setTab('holiday')">휴일</button>
     <button class="btn" id="tab-admins" onclick="setTab('admins')">관리자</button>
   </div>
 
-  <div class="section hidden" id="pane-admins">
-    <div class="card summary">관리자는 직원 화면에서 가입한 사람 중에서 지정합니다. 관리자 지정과 해제는 마스터만 할 수 있습니다.</div>
-    <div class="card">
-      <div class="lot-title"><span>새 관리자 지정</span></div>
-      <div class="toolbar"><select class="input" id="newAdmin"></select></div>
-      <div class="toolbar" id="newPerms"></div>
-      <button class="btn btn-primary" onclick="addAdmin()">관리자로 지정</button>
-    </div>
-    <div class="card" id="adminList"></div>
-  </div>
-
-  <div class="section" id="pane-users">
+  <!-- 직원 -->
+  <div class="section hidden" id="pane-users">
     <div class="card summary" id="userSummary"></div>
     <div class="card">
       <div class="toolbar"><input class="input" id="userSearch" placeholder="이름, 차량번호, 이메일 검색" oninput="renderUsers()" /></div>
@@ -140,6 +155,32 @@
     </div>
   </div>
 
+  <!-- 월별 그룹 -->
+  <div class="section hidden" id="pane-group">
+    <div class="card">
+      <div class="toolbar">
+        <input class="input" type="month" id="groupMonth" onchange="renderGroups(); pushNav()" />
+      </div>
+      <div class="summary" id="groupSummary"></div>
+    </div>
+    <div class="card" id="groupList"></div>
+  </div>
+
+  <!-- 주간 배정 -->
+  <div class="section hidden" id="pane-week">
+    <div class="card">
+      <div class="toolbar">
+        <button class="btn" onclick="shiftWeek(-7)">이전 주</button>
+        <div class="summary" style="flex:1;text-align:center;" id="weekTitle"></div>
+        <button class="btn" onclick="shiftWeek(7)">다음 주</button>
+      </div>
+      <div class="summary" id="weekInfo"></div>
+      <div class="toolbar" style="margin:10px 0 0;" id="weekActions"></div>
+    </div>
+    <div class="card" id="weekDraft"></div>
+  </div>
+
+  <!-- 일자별 -->
   <div class="section hidden" id="pane-day">
     <div class="card">
       <div class="toolbar">
@@ -152,11 +193,53 @@
     <div class="card" id="dayBoard"></div>
   </div>
 
+  <!-- 통계 -->
   <div class="section hidden" id="pane-stats">
     <div class="card">
-      <div class="toolbar"><input class="input" type="month" id="monthPick" onchange="loadStats()" /></div>
+      <div class="toolbar"><input class="input" type="month" id="monthPick" onchange="loadStats(); pushNav()" /></div>
       <div id="stats"></div>
     </div>
+  </div>
+
+  <!-- 공지 -->
+  <div class="section hidden" id="pane-notice">
+    <div class="card" id="noticeForm">
+      <div class="lot-title"><span id="noticeFormTitle">새 공지</span></div>
+      <input class="input" id="nTitle" placeholder="제목" style="margin-bottom:8px;" />
+      <textarea class="input" id="nBody" placeholder="내용"></textarea>
+      <div class="toolbar" style="margin:8px 0 0;">
+        <label class="chk"><input type="checkbox" id="nPinned" /> 신청 화면 위에 고정</label>
+        <span style="flex:1"></span>
+        <button class="btn" onclick="resetNoticeForm()">새로 쓰기</button>
+        <button class="btn btn-primary" onclick="saveNotice()">저장</button>
+      </div>
+    </div>
+    <div class="card" id="noticeList"></div>
+  </div>
+
+  <!-- 휴일 -->
+  <div class="section hidden" id="pane-holiday">
+    <div class="card">
+      <div class="summary">토요일·주일은 자동으로 제외됩니다. 여기에는 평일 공휴일과 회사 휴무일을 관리합니다. 공휴일 날짜는 인사혁신처 발표로 한 번 확인해 주세요.</div>
+      <div class="toolbar" style="margin:10px 0 0;" id="holidayForm">
+        <input class="input" type="date" id="hDate" />
+        <input class="input" id="hName" placeholder="이름 (예: 설날, 회사 휴무)" />
+        <button class="btn btn-primary" onclick="addHoliday()">휴일 추가</button>
+      </div>
+    </div>
+    <div class="card" id="holidayList"></div>
+  </div>
+
+  <!-- 관리자 (마스터 전용) -->
+  <div class="section hidden" id="pane-admins">
+    <div class="card summary">관리자는 직원 화면에서 가입한 사람 중에서 지정합니다. 관리자 지정과 해제는 마스터만 할 수 있습니다.</div>
+    <div class="card">
+      <div class="lot-title"><span>새 관리자 지정</span></div>
+      <div class="toolbar"><select class="input" id="newAdmin"></select></div>
+      <div class="toolbar" id="newPerms"></div>
+      <button class="btn btn-primary" onclick="addAdmin()">관리자로 지정</button>
+    </div>
+    <div class="card" id="adminList"></div>
   </div>
 </div>
 
@@ -164,22 +247,39 @@
 
 <script src="firebase-config.js"></script>
 <script src="parking-core.js"></script>
+<script src="parking-ui.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
-var P = Parking;
-var _db = null, _users = {}, _usersRef = null, _dayRef = null, _reqRef = null;
-var _day = null, _reqCount = 0, _tab = null;
-var _me = null, _perms = {}, _master = false, _myAdminRef = null, _adminsRef = null, _admins = {};
-var LOT_NAME = { annex: '별관', nam: '남경', wait: '대기' };
+var P = Parking, U = ParkingUI, esc = U.esc;
+var _db = null, _users = {}, _holidays = {}, _notices = {}, _admins = {};
+var _refs = [], _dayRefs = [], _weekRefs = [], _myAdminRef = null, _adminsRef = null, _started = false;
+var _day = null, _wk = null, _week = null, _apps = {}, _draft = null;
+var _me = null, _perms = {}, _master = false, _tab = null, _vis = {}, _editNotice = null;
+var TABS = ['users', 'group', 'week', 'day', 'stats', 'notice', 'holiday', 'admins'];
 // 마스터가 관리자에게 골라서 줄 수 있는 권한
 var PERMS = [
-  { key: 'users',    name: '직원 승인·수정',   desc: '가입 승인, 그룹·이름·차량번호 수정, 삭제' },
+  { key: 'users',    name: '직원 승인·그룹',   desc: '가입 승인, 이름·차량번호 수정, 삭제, 월별 홀수/짝수 그룹 승인' },
   { key: 'priority', name: '우선 배정 지정',   desc: '우선 배정 대상 지정과 해제' },
-  { key: 'day',      name: '일자별 현황 처리', desc: '주차 완료·해제·반납 처리, 배정 확정·9시 해제 실행' },
-  { key: 'stats',    name: '월별 통계',        desc: '직원별 월 이용 횟수 조회' }
+  { key: 'day',      name: '배정·휴일 관리',   desc: '주간 배정안 조정과 발표, 일자별 주차 완료·해제·반납 처리, 휴일 관리' },
+  { key: 'notice',   name: '공지 관리',        desc: '공지 작성, 수정, 고정, 삭제' }
+];
+// 공지가 하나도 없을 때 불러올 수 있는 기본 공지
+var DEFAULT_NOTICES = [
+  { pinned: true, title: '주차 신청 일정 안내', body:
+    '매주 금요일 오후 2시에 다음 주(월~금) 주차 신청이 열리고, 오후 2시 30분에 마감됩니다.\n' +
+    '오후 4시에 배정 결과가 발표되며 회사 메일로도 안내됩니다.\n' +
+    '토요일, 주일, 공휴일은 신청을 받지 않습니다. 시간은 인터넷(서버) 시간 기준입니다.' },
+  { pinned: true, title: '별관 주차 유의사항', body:
+    '별관에 주차한 차량은 퇴근 시까지 출차가 어렵습니다.\n근무 중 차량을 써야 하는 날은 신청 전에 참고해 주세요.' },
+  { pinned: false, title: '배정 기준과 반납 안내', body:
+    '하루 별관 8면, 남경 5면 모두 13면입니다.\n' +
+    '별관은 그날 그룹(홀수날/짝수날) 신청자에게 먼저, 남경은 그 밖의 신청자에게 배정하며, 이번 달 이용 횟수가 적은 사람부터 배정합니다.\n' +
+    '배정 후 못 오게 되면 꼭 반납해 주세요. 당일 오전 9시까지 \'주차 완료\'를 누르지 않으면 대기자에게 넘어갑니다.\n' +
+    '반납 없이 오지 않은 경우(미도착)는 다른 사람의 이용 기회를 막은 것으로 보고, 다음 주 배정에서 제외됩니다.\n' +
+    '매달 홀수날·짝수날 그룹을 골라 승인 요청하며, 관리자가 양쪽 인원을 맞춰 승인합니다.' }
 ];
 
 window.addEventListener('load', function () {
@@ -207,6 +307,7 @@ window.addEventListener('load', function () {
       enter();
     }, function () { deny('마스터 관리자(' + MASTER_NAME + ')에게 권한을 요청하세요.'); });
   });
+  setInterval(function () { if (_started) { advance(); if (_tab === 'week') renderWeek(); } }, 30000);
 });
 
 function show(id) {
@@ -234,63 +335,64 @@ function resetPw() {
     .catch(function () { msg.textContent = '메일을 보내지 못했습니다'; });
 }
 
+function on(path, fn, list) {
+  var r = _db.ref(P.ROOT + '/' + path);
+  r.on('value', function (s) { fn(s.val()); }, function () {});
+  (list || _refs).push(r);
+  return r;
+}
+
 function enter() {
   show('adminScreen');
   var names = PERMS.filter(function (p) { return can(p.key); }).map(function (p) { return p.name; });
   document.getElementById('roleLine').textContent = _master ? '마스터 관리자 · 모든 권한'
     : '관리자 · ' + (names.length ? names.join(', ') : '조회만 가능');
-  var vis = { users: can('users') || can('priority'), day: true, stats: can('stats'), admins: _master };
-  _vis = vis;
-  Object.keys(vis).forEach(function (k) { document.getElementById('tab-' + k).classList.toggle('hidden', !vis[k]); });
+  _vis = { users: can('users') || can('priority'), group: true, week: true, day: true, stats: true, notice: true, holiday: true, admins: _master };
+  TABS.forEach(function (k) { document.getElementById('tab-' + k).classList.toggle('hidden', !_vis[k]); });
+  document.getElementById('noticeForm').classList.toggle('hidden', !can('notice'));
+  document.getElementById('holidayForm').classList.toggle('hidden', !can('day'));
   var nav = readNav();
-  if (!_tab && nav.tab && vis[nav.tab]) _tab = nav.tab;
-  if (!_tab || !vis[_tab]) _tab = ['users', 'day', 'stats', 'admins'].filter(function (k) { return vis[k]; })[0];
-  if (!_usersRef) {
-    _usersRef = _db.ref(P.ROOT + '/users');
-    _usersRef.on('value', function (s) { _users = s.val() || {}; renderUsers(); renderDay(); renderAdmins(); });
+  if (!_started) {
+    _started = true;
     document.getElementById('dayPick').value = nav.day || P.today();
-    document.getElementById('monthPick').value = P.today().slice(0, 7);
+    document.getElementById('monthPick').value = (nav.tab === 'stats' && nav.arg) || P.today().slice(0, 7);
+    document.getElementById('groupMonth').value = (nav.tab === 'group' && nav.arg) || P.addMonths(P.today().slice(0, 7), 1);
+    _wk = (nav.tab === 'week' && nav.arg) || P.nextWeek();
+    if (nav.tab && _vis[nav.tab]) _tab = nav.tab;
+    on('users', function (v) { var first = !Object.keys(_users).length; _users = v || {}; renderAll(); if (first) advance(); });
+    on('holidays', function (v) { _holidays = v || {}; renderHolidays(); renderWeek(); });
+    on('notices', function (v) { _notices = v || {}; renderNotices(); });
     watchDay();
+    watchWeek();
   }
   if (_master && !_adminsRef) {
     _adminsRef = _db.ref(P.ROOT + '/admins');
     _adminsRef.on('value', function (s) { _admins = s.val() || {}; renderAdmins(); });
   }
+  if (!_tab || !_vis[_tab]) _tab = TABS.filter(function (k) { return _vis[k]; })[0];
   setTab(_tab, true);
   history.replaceState(null, '', navHash());
-  renderUsers(); renderDay();
+  renderAll();
+  advance();
 }
-
-// ── 뒤로 가기: 탭과 날짜를 주소(#)에 남겨서 휴대폰 뒤로 가기로 앞 단계에 돌아가게 함 ──
-var _vis = {};
-function readNav() {
-  var m = location.hash.match(/^#(users|day|stats|admins)(?:\/(\d{4}-\d{2}-\d{2}))?$/);
-  return m ? { tab: m[1], day: m[2] } : {};
-}
-function navHash() {
-  return '#' + _tab + (_tab === 'day' ? '/' + document.getElementById('dayPick').value : '');
-}
-function pushNav() { if (location.hash !== navHash()) history.pushState(null, '', navHash()); }
-window.addEventListener('popstate', function () {
-  if (!_usersRef) return;
-  var nav = readNav();
-  if (nav.day && nav.day !== document.getElementById('dayPick').value) {
-    document.getElementById('dayPick').value = nav.day;
-    watchDay();
-  }
-  if (nav.tab && _vis[nav.tab]) setTab(nav.tab, true);
-});
 function stop() {
-  if (_usersRef) { _usersRef.off(); _usersRef = null; }
-  if (_dayRef) { _dayRef.off(); _dayRef = null; }
-  if (_reqRef) { _reqRef.off(); _reqRef = null; }
+  _refs.concat(_dayRefs, _weekRefs).forEach(function (r) { r.off(); });
+  _refs = []; _dayRefs = []; _weekRefs = [];
   if (_myAdminRef) { _myAdminRef.off(); _myAdminRef = null; }
   if (_adminsRef) { _adminsRef.off(); _adminsRef = null; }
-  _master = false; _perms = {}; _admins = {};
+  _master = false; _perms = {}; _admins = {}; _started = false;
 }
+function renderAll() { renderUsers(); renderGroups(); renderWeek(); renderDay(); renderAdmins(); }
+
+// 시간이 된 단계 진행 (배정 권한이 있으면 마감 직후 배정안까지 만듦)
+function advance() {
+  if (!Object.keys(_users).length) return;
+  P.advance(_db, _users, can('day')).catch(function (e) { console.error(e); });
+}
+
 function setTab(t, fromNav) {
   _tab = t;
-  ['users', 'day', 'stats', 'admins'].forEach(function (k) {
+  TABS.forEach(function (k) {
     document.getElementById('pane-' + k).classList.toggle('hidden', k !== t);
     document.getElementById('tab-' + k).classList.toggle('btn-on', k === t);
   });
@@ -298,11 +400,392 @@ function setTab(t, fromNav) {
   if (!fromNav) pushNav();
 }
 
+// ── 뒤로 가기: 탭과 날짜를 주소(#)에 남김 ──
+function navHash() {
+  var arg = { day: document.getElementById('dayPick').value, week: _wk, stats: document.getElementById('monthPick').value, group: document.getElementById('groupMonth').value }[_tab];
+  return '#' + _tab + (arg ? '/' + arg : '');
+}
+function readNav() {
+  var m = location.hash.match(/^#([a-z]+)(?:\/([\d-]+))?$/);
+  if (!m || TABS.indexOf(m[1]) < 0) return {};
+  return { tab: m[1], arg: m[2], day: m[1] === 'day' ? m[2] : null };
+}
+function pushNav() { if (location.hash !== navHash()) history.pushState(null, '', navHash()); }
+window.addEventListener('popstate', function () {
+  if (!_started) return;
+  var nav = readNav();
+  if (!nav.tab || !_vis[nav.tab]) return;
+  if (nav.tab === 'day' && nav.arg && nav.arg !== document.getElementById('dayPick').value) { document.getElementById('dayPick').value = nav.arg; watchDay(); }
+  if (nav.tab === 'week' && nav.arg && nav.arg !== _wk) { _wk = nav.arg; watchWeek(); }
+  if (nav.tab === 'stats' && nav.arg) document.getElementById('monthPick').value = nav.arg;
+  if (nav.tab === 'group' && nav.arg) { document.getElementById('groupMonth').value = nav.arg; renderGroups(); }
+  setTab(nav.tab, true);
+});
+
+// ── 직원 ────────────────────────────────────
+function renderUsers() {
+  var ids = Object.keys(_users);
+  var ok = ids.filter(function (u) { return _users[u].approved; });
+  var t = P.today();
+  var cnt = function (g) { return ok.filter(function (u) { return P.groupOf(_users[u], t) === g; }).length; };
+  var pend = ids.length - ok.length;
+  document.getElementById('userSummary').innerHTML =
+    '승인 <b>' + ok.length + '명</b> (이번 달 홀수 ' + cnt('odd') + ' · 짝수 ' + cnt('even') + ') · 우선 배정 ' +
+    ok.filter(function (u) { return _users[u].priority; }).length + '명' +
+    (pend ? ' · <b style="color:var(--accent)">승인 대기 ' + pend + '명</b>' : '');
+
+  var q = document.getElementById('userSearch').value.trim().toLowerCase();
+  ids = ids.filter(function (u) {
+    var p = _users[u];
+    return !q || [p.name, p.plate, p.email].join(' ').toLowerCase().indexOf(q) >= 0;
+  }).sort(function (a, b) {
+    return (_users[a].approved ? 1 : 0) - (_users[b].approved ? 1 : 0) ||
+      String(_users[a].name).localeCompare(String(_users[b].name), 'ko');
+  });
+  var html = '', cu = can('users'), cp = can('priority');
+  ids.forEach(function (u) {
+    var p = _users[u];
+    html += '<div class="user' + (p.approved ? '' : ' pending') + '">' +
+      '<div><div class="u-name">' + esc(p.name) + ' · ' + esc(p.plate) + '</div><div class="u-sub">' + esc(p.email) +
+      ' · 이번 달 ' + P.groupName(P.groupOf(p, t)) + '날</div></div>' +
+      '<div class="u-ctrl">' +
+        (cp ? '<label class="chk"><input type="checkbox"' + (p.priority ? ' checked' : '') + ' onchange="setUser(\'' + u + '\',\'priority\',this.checked)" />우선</label>'
+          : (p.priority ? '<span class="badge">우선</span>' : '')) +
+        (cu ? (p.approved
+          ? '<button class="btn" onclick="setUser(\'' + u + '\',\'approved\',false)">승인 취소</button>'
+          : '<button class="btn btn-primary" onclick="approveUser(\'' + u + '\')">승인</button>') +
+          '<button class="btn" onclick="editUser(\'' + u + '\')">수정</button>' +
+          '<button class="btn btn-danger" onclick="deleteUser(\'' + u + '\')">삭제</button>'
+          : (p.approved ? '' : '<span class="badge">승인 대기</span>')) +
+      '</div></div>';
+  });
+  document.getElementById('userList').innerHTML = html || '<div class="empty">등록된 직원이 없습니다</div>';
+}
+function setUser(uid, field, val) {
+  var upd = {};
+  upd[field] = (field === 'priority' && !val) ? null : val;
+  _db.ref(P.ROOT + '/users/' + uid).update(upd)
+    .then(function () { showToast('저장했습니다'); }, function (e) { showToast('저장 실패: ' + e.message); });
+}
+// 가입 승인: 가입 때 고른 그룹을 이번 달 그룹으로 확정
+function approveUser(uid) {
+  var upd = { approved: true }, ym = P.today().slice(0, 7);
+  if (!(_users[uid].groups && _users[uid].groups[ym])) upd['groups/' + ym] = _users[uid].group;
+  _db.ref(P.ROOT + '/users/' + uid).update(upd)
+    .then(function () { showToast('승인했습니다 (' + (+ym.slice(5)) + '월 ' + P.groupName(_users[uid].group) + '날)'); }, function (e) { showToast('실패: ' + e.message); });
+}
+function editUser(uid) {
+  var p = _users[uid];
+  var name = prompt('이름', p.name); if (name === null) return;
+  var plate = prompt('차량번호', p.plate); if (plate === null) return;
+  _db.ref(P.ROOT + '/users/' + uid).update({ name: name.trim() || p.name, plate: plate.trim() || p.plate })
+    .then(function () { showToast('저장했습니다'); });
+}
+function deleteUser(uid) {
+  if (!confirm(_users[uid].name + ' 님의 등록을 삭제할까요? 지난 기록에는 이름이 "삭제됨"으로 표시됩니다.')) return;
+  _db.ref(P.ROOT + '/users/' + uid).remove().then(function () { showToast('삭제했습니다'); });
+}
+
+// ── 월별 그룹 승인 ──────────────────────────
+function renderGroups() {
+  var ym = document.getElementById('groupMonth').value;
+  if (!ym) return;
+  var key = ym + '-15', cu = can('users');
+  var ids = Object.keys(_users).filter(function (u) { return _users[u].approved; })
+    .sort(function (a, b) { return String(_users[a].name).localeCompare(String(_users[b].name), 'ko'); });
+  var eff = { odd: 0, even: 0 }, req = { odd: 0, even: 0 }, pending = [];
+  ids.forEach(function (u) {
+    var p = _users[u], r = p.groupReq && p.groupReq[ym], a = p.groups && p.groups[ym];
+    eff[P.groupOf(p, key)]++;
+    if (r) req[r]++;
+    if (r && r !== a) pending.push(u);
+  });
+  // 그 달의 홀수날·짝수날 평일 수 (공휴일 제외)
+  var days = { odd: 0, even: 0 };
+  for (var k = ym + '-01'; k.slice(0, 7) === ym; k = P.addDays(k, 1)) {
+    var w = P.dow(k);
+    if (w > 0 && w < 6 && !P.isHoliday(k, _holidays)) days[P.dayGroup(k)]++;
+  }
+  var diff = Math.abs(eff.odd - eff.even);
+  document.getElementById('groupSummary').innerHTML =
+    (+ym.slice(5)) + '월 그룹 (승인 반영): 홀수 <b>' + eff.odd + '명</b> · 짝수 <b>' + eff.even + '명</b>' +
+    (diff > Math.max(2, Math.round(ids.length * 0.1)) ? ' <span class="warn">· ' + diff + '명 차이</span>' : ' · 균형 양호') +
+    '<br>평일 수(공휴일 제외): 홀수날 ' + days.odd + '일 · 짝수날 ' + days.even + '일' +
+    '<br>직원 요청: 홀수 ' + req.odd + '명 · 짝수 ' + req.even + '명 · 승인 대기 <b>' + pending.length + '건</b>' +
+    (cu && pending.length ? '<div class="toolbar" style="margin:8px 0 0;"><button class="btn btn-primary" onclick="approveAllGroups()">요청대로 모두 승인</button></div>' : '') +
+    '<div class="note">요청이 없는 사람은 지난달 그룹이 그대로 이어집니다. 한쪽에 몰리면 직원과 상의한 뒤 그룹을 바꿔 승인하세요.</div>';
+  ids.sort(function (a, b) { return (pending.indexOf(b) >= 0 ? 1 : 0) - (pending.indexOf(a) >= 0 ? 1 : 0); });   // 승인 대기 먼저
+  document.getElementById('groupList').innerHTML = ids.map(function (u) {
+    var p = _users[u], r = p.groupReq && p.groupReq[ym], a = p.groups && p.groups[ym], g = P.groupOf(p, key);
+    var state = a ? (r && r !== a ? '<span class="badge pin">요청 ' + P.groupName(r) + ' · 승인 대기</span>' : '<span class="badge">승인됨</span>')
+      : r ? '<span class="badge pin">요청 ' + P.groupName(r) + ' · 승인 대기</span>' : '<span class="badge">이어짐</span>';
+    return '<div class="user"><div><div class="u-name">' + esc(p.name) + '</div><div class="u-sub">' + P.groupName(g) + '날 ' + state + '</div></div>' +
+      '<div class="u-ctrl">' + (cu
+        ? '<button class="btn ' + (a === 'odd' ? 'btn-on' : '') + '" onclick="setGroup(\'' + u + '\',\'' + ym + '\',\'odd\')">홀수날 승인</button>' +
+          '<button class="btn ' + (a === 'even' ? 'btn-on' : '') + '" onclick="setGroup(\'' + u + '\',\'' + ym + '\',\'even\')">짝수날 승인</button>'
+        : '') + '</div></div>';
+  }).join('') || '<div class="empty">승인된 직원이 없습니다</div>';
+}
+function setGroup(uid, ym, g) {
+  _db.ref(P.ROOT + '/users/' + uid + '/groups/' + ym).set(g)
+    .then(function () { showToast(_users[uid].name + ' · ' + (+ym.slice(5)) + '월 ' + P.groupName(g) + '날 승인'); }, function (e) { showToast('실패: ' + e.message); });
+}
+function approveAllGroups() {
+  var ym = document.getElementById('groupMonth').value, upd = {};
+  Object.keys(_users).forEach(function (u) {
+    var p = _users[u], r = p.groupReq && p.groupReq[ym];
+    if (p.approved && r && !(p.groups && p.groups[ym] === r)) upd[u + '/groups/' + ym] = r;
+  });
+  if (!Object.keys(upd).length) return;
+  if (!confirm(Object.keys(upd).length + '건을 요청대로 승인할까요?')) return;
+  _db.ref(P.ROOT + '/users').update(upd).then(function () { showToast('승인했습니다'); }, function (e) { showToast('실패: ' + e.message); });
+}
+
+// ── 주간 배정 ───────────────────────────────
+function shiftWeek(n) { _wk = P.addDays(_wk, n); watchWeek(); pushNav(); }
+function watchWeek() {
+  _weekRefs.forEach(function (r) { r.off(); }); _weekRefs = [];
+  _week = null; _apps = {}; _draft = null;
+  on('weeks/' + _wk, function (v) { _week = v; renderWeek(); }, _weekRefs);
+  on('apps/' + _wk, function (v) { _apps = v || {}; renderWeek(); }, _weekRefs);
+  on('drafts/' + _wk, function (v) { _draft = v; renderWeek(); }, _weekRefs);
+}
+function renderWeek() {
+  if (!_wk) return;
+  var sc = P.schedule(_wk), t = P.now(), cd = can('day');
+  var dates = _week && _week.days ? Object.keys(_week.days).sort() : P.weekDays(_wk, _holidays);
+  document.getElementById('weekTitle').innerHTML = '<b>' + P.shortLabel(_wk) + ' ~ ' + P.shortLabel(P.addDays(_wk, 4)) + '</b>';
+  var phase = !_week ? '일정 없음' : _week.publishedAt ? '발표됨' : t < sc.openAt ? '신청 전' : t < sc.closeAt ? '신청 중' : t < sc.publishAt ? '마감 · 배정 조정 중' : '발표 대기';
+  var fri = P.addDays(_wk, -3);
+  var nApp = Object.keys(_apps).length;
+  var perDay = dates.map(function (k) {
+    var n = Object.keys(_apps).filter(function (u) { return _apps[u].dates && _apps[u].dates[k]; }).length;
+    return P.shortLabel(k) + ' ' + n + '명';
+  }).join(' · ');
+  document.getElementById('weekInfo').innerHTML =
+    '상태: <b>' + phase + '</b><br>' + P.label(fri) + ' ' + P.hm(sc.openAt) + ' 신청 시작 · ' + P.hm(sc.closeAt) + ' 마감 · ' + P.hm(sc.publishAt) + ' 발표' +
+    '<br>신청 ' + nApp + '명 · ' + (perDay || '신청일 없음') +
+    (_week && _week.publishedAt ? '<br>발표 ' + fmtTime(_week.publishedAt) + (_week.emailedAt ? ' · 메일 발송 ' + fmtTime(_week.emailedAt) : ' · 메일 발송 전') : '') +
+    '<div class="note">마감(' + P.hm(sc.closeAt) + ') 직후 이용 횟수가 적은 순으로 배정안이 자동으로 만들어집니다. 발표 전까지 아래에서 조정할 수 있고, ' + P.hm(sc.publishAt) + '에 확정되어 메일이 나갑니다.</div>';
+
+  var acts = '';
+  if (cd && !(_week && _week.publishedAt)) {
+    if (!_week) acts += '<button class="btn btn-primary" onclick="makeWeek()">신청 일정 만들기</button>';
+    else if (t < sc.openAt) acts += '<button class="btn" onclick="remakeWeek()">휴일 반영해 신청일 다시 계산</button>';
+    if (_week && t >= sc.closeAt) acts += '<button class="btn" onclick="remakeDraft()">' + (_draft ? '배정안 다시 만들기' : '배정안 만들기') + '</button>';
+    if (_week && _draft && t >= sc.closeAt) acts += '<button class="btn btn-primary" onclick="publishNow()">' + (t < sc.publishAt ? '지금 발표' : '발표') + '</button>';
+  }
+  document.getElementById('weekActions').innerHTML = acts;
+
+  var box = document.getElementById('weekDraft');
+  if (_week && _week.publishedAt) {
+    box.innerHTML = '<div class="summary">발표된 주입니다. 날짜별 반납·해제 처리는 <a href="#" onclick="openDay(\'' + dates[0] + '\');return false;">일자별</a> 탭에서 합니다.</div>';
+    return;
+  }
+  if (!_draft) {
+    box.innerHTML = '<div class="empty">' + (t < sc.closeAt ? '신청 마감 후 배정안이 만들어집니다.' : cd ? '배정안이 아직 없습니다. 위의 \'배정안 만들기\'를 누르세요.' : '배정안이 아직 없습니다.') + '</div>';
+    return;
+  }
+  var pen = _draft.penalized || {};
+  box.innerHTML = '<div class="summary" style="margin-bottom:6px;">배정안 (' + fmtTime(_draft.createdAt) + ' 생성)' + (cd ? ' · 사람마다 별관/남경/대기를 바꿀 수 있습니다' : '') + '</div>' +
+    (Object.keys(pen).length ? '<div class="summary"><span class="warn">미도착 패널티로 제외: </span>' + Object.keys(pen).map(function (u) {
+      return esc((_users[u] || {}).name || '(삭제됨)') + ' (' + pen[u].map(P.shortLabel).join(', ') + ')';
+    }).join(', ') + '<div class="note">면제하려면 일자별 탭에서 해당 날짜의 \'패널티 면제\'를 누른 뒤 \'배정안 다시 만들기\'를 하세요.</div></div>' : '') +
+    dates.map(function (k) {
+      var seats = (_draft.days && _draft.days[k]) || {};
+      return '<div class="day-block"><h4>' + P.label(k) + ' · ' + P.groupName(P.dayGroup(k)) + '날</h4>' + draftDay(k, seats, cd) + '</div>';
+    }).join('');
+}
+function draftDay(k, seats, cd) {
+  var out = '';
+  ['annex', 'nam', 'wait'].forEach(function (lot) {
+    var list = Object.keys(seats).filter(function (u) { return seats[u].lot === lot; })
+      .sort(function (a, b) { return (seats[a].order || 99) - (seats[b].order || 99); });
+    var cap = P.LOTS[lot] && P.LOTS[lot].cap;
+    out += '<div class="lot-title ' + lot + '"><span>' + U.LOT_NAME[lot] + '</span><span class="' + (cap && list.length > cap ? 'over' : '') + '">' +
+      (cap ? list.length + ' / ' + cap : list.length + '명') + '</span></div>';
+    if (!list.length) out += '<div class="empty">없음</div>';
+    list.forEach(function (u, i) {
+      var p = _users[u] || {};
+      var mine = p.priority ? '우선' : P.groupOf(p, k) === P.dayGroup(k) ? '그날 그룹' : '';
+      out += '<div class="row"><span class="no">' + (i + 1) + '</span><span class="nm">' + esc(p.name || '(삭제됨)') +
+        ' <span class="pl">' + esc(p.plate || '') + '</span></span>' + (mine ? '<span class="badge">' + mine + '</span>' : '') +
+        (cd ? '<select onchange="moveDraft(\'' + k + '\',\'' + u + '\',this.value)">' +
+          ['annex', 'nam', 'wait'].map(function (l) { return '<option value="' + l + '"' + (l === lot ? ' selected' : '') + '>' + U.LOT_NAME[l] + '</option>'; }).join('') +
+          '<option value="out">제외</option></select>' : '') + '</div>';
+    });
+  });
+  return out;
+}
+function moveDraft(k, uid, lot) {
+  var seats = (_draft.days && _draft.days[k]) || {};
+  var n = Object.keys(seats).filter(function (u) { return u !== uid && seats[u].lot === lot; }).length;
+  if (P.LOTS[lot] && n >= P.LOTS[lot].cap && !confirm(U.LOT_NAME[lot] + '이 이미 ' + P.LOTS[lot].cap + '대로 찼습니다. 그래도 옮길까요?')) { renderWeek(); return; }
+  var r = _db.ref(P.ROOT + '/drafts/' + _wk + '/days/' + k + '/' + uid);
+  (lot === 'out' ? r.remove() : r.set({ lot: lot, order: n + 1, status: lot === 'wait' ? 'wait' : 'ok', moved: true }))
+    .then(function () { showToast('배정안을 바꿨습니다'); }, function (e) { showToast('실패: ' + e.message); });
+}
+function makeWeek() { done(P.ensureWeek(_db, _wk)); }
+function remakeWeek() {
+  var days = {};
+  P.weekDays(_wk, _holidays).forEach(function (k) { days[k] = true; });
+  done(_db.ref(P.ROOT + '/weeks/' + _wk + '/days').set(days));
+}
+function remakeDraft() {
+  if (_draft && !confirm('지금까지 조정한 내용이 지워지고 배정안을 처음부터 다시 만듭니다. 계속할까요?')) return;
+  done(_db.ref(P.ROOT + '/drafts/' + _wk).remove().then(function () { return P.ensureDraft(_db, _wk, _users); }));
+}
+function publishNow() {
+  if (!confirm('배정안을 확정해서 발표할까요? 발표 후에는 일자별 탭에서만 바꿀 수 있습니다.' + (P.now() < P.schedule(_wk).publishAt ? '\n(메일은 오후 4시 자동 실행 때 발송됩니다)' : ''))) return;
+  done(P.publish(_db, _wk, _users, true));
+}
+function openDay(k) { document.getElementById('dayPick').value = k; watchDay(); setTab('day'); }
+
+// ── 일자별 현황 ─────────────────────────────
+function shiftDay(n) {
+  var el = document.getElementById('dayPick');
+  el.value = P.addDays(el.value || P.today(), n);
+  watchDay();
+  pushNav();
+}
+function watchDay() {
+  var key = document.getElementById('dayPick').value || P.today();
+  _dayRefs.forEach(function (r) { r.off(); }); _dayRefs = [];
+  _day = null; _dayWaivers = {};
+  on('days/' + key, function (v) { _day = v; renderDay(); }, _dayRefs);
+  on('waivers/' + key, function (v) { _dayWaivers = v || {}; renderDay(); }, _dayRefs);
+}
+var _dayWaivers = {};
+function renderDay() {
+  var key = document.getElementById('dayPick').value;
+  if (!key) return;
+  var info = '<b>' + P.label(key) + '</b> · ' + P.groupName(P.dayGroup(key)) + '날';
+  var w = P.dow(key);
+  if (w === 0 || w === 6) info += ' · 주말';
+  else if (P.isHoliday(key, _holidays)) info += ' · ' + esc(P.holidayName(key, _holidays) || '휴일');
+  var board = '';
+  if (!_day || !_day.finalized) {
+    info += '<br>아직 발표된 배정이 없습니다. 주간 배정은 \'주간 배정\' 탭에서 확인하세요.';
+    board = '<div class="empty">배정 전입니다</div>';
+  } else {
+    info += '<br>배정 확정 ' + fmtTime(_day.finalizedAt) + (_day.swept ? ' · 오전 9시 해제 처리됨' : '');
+    if (can('day') && key === P.today() && !_day.swept && P.now() >= P.releaseTime(key)) {
+      info += ' <button class="btn btn-primary" onclick="runSweep()">9시 해제 실행</button>';
+    }
+    board = U.boardHtml(_day, _users, { actions: can('day') ? dayActions : null });
+  }
+  document.getElementById('dayInfo').innerHTML = info;
+  document.getElementById('dayBoard').innerHTML = board;
+}
+function dayActions(u, s) {
+  if (s.status === 'ok') return act('주차 완료', 'adminCheckIn', u) + act('해제', 'adminRelease', u);
+  if (s.status === 'in') return act('반납 처리', 'adminReturn', u);
+  if (s.status === 'wait') return act('대기 취소', 'adminReturn', u);
+  if (s.status === 'released') return _dayWaivers[u]
+    ? '<span class="badge">패널티 면제됨</span>' + act('면제 취소', 'unwaive', u)
+    : '<span class="badge pin">미도착 패널티</span>' + act('패널티 면제', 'waive', u);
+  return '';
+}
+function waive(u) {
+  if (!confirm((_users[u] || {}).name + ' 님의 ' + P.shortLabel(dayKey()) + ' 미도착 패널티를 면제할까요? 다음 주 배정에서 제외되지 않습니다.')) return;
+  done(_db.ref(P.ROOT + '/waivers/' + dayKey() + '/' + u).set(true));
+}
+function unwaive(u) { done(_db.ref(P.ROOT + '/waivers/' + dayKey() + '/' + u).remove()); }
+function act(text, fn, uid) { return '<button class="btn" onclick="' + fn + '(\'' + uid + '\')">' + text + '</button>'; }
+function dayKey() { return document.getElementById('dayPick').value; }
+function done(p) { p.then(function () { showToast('처리했습니다'); }, function (e) { showToast('실패: ' + (e && e.message)); }); }
+function adminCheckIn(u) { done(P.checkIn(_db, dayKey(), u)); }
+function adminRelease(u) { if (confirm('이 배정을 해제하고 대기자에게 넘길까요?')) done(P.release(_db, dayKey(), u, _users)); }
+function adminReturn(u) { if (confirm('반납(대기 취소) 처리할까요?')) done(P.returnSeat(_db, dayKey(), u, _users)); }
+function runSweep() { done(P.ensureSwept(_db, dayKey(), _users)); }
+
+// ── 통계 ───────────────────────────────────
+function loadStats() {
+  var ym = document.getElementById('monthPick').value;
+  if (!ym) return;
+  U.loadStats(_db, ym).then(function (st) {
+    document.getElementById('stats').innerHTML = U.statsHtml(ym, st, _users, null);
+  }, function () { document.getElementById('stats').innerHTML = '<div class="empty">통계를 불러오지 못했습니다</div>'; });
+}
+
+// ── 공지 ───────────────────────────────────
+function renderNotices() {
+  var list = U.sortedNotices(_notices), cn = can('notice');
+  var html = list.map(function (n) {
+    return U.noticeHtml(n, cn ? ' <button class="btn" onclick="editNotice(\'' + n.id + '\')">수정</button>' +
+      '<button class="btn" onclick="pinNotice(\'' + n.id + '\',' + !n.pinned + ')">' + (n.pinned ? '고정 해제' : '고정') + '</button>' +
+      '<button class="btn btn-danger" onclick="deleteNotice(\'' + n.id + '\')">삭제</button>' : '');
+  }).join('');
+  if (!list.length) html = '<div class="empty">공지가 없습니다.</div>' + (cn ? '<button class="btn btn-primary" onclick="loadDefaultNotices()">기본 공지 불러오기 (신청 일정, 별관 유의사항, 배정 기준)</button>' : '');
+  document.getElementById('noticeList').innerHTML = html;
+}
+function resetNoticeForm() {
+  _editNotice = null;
+  document.getElementById('noticeFormTitle').textContent = '새 공지';
+  document.getElementById('nTitle').value = '';
+  document.getElementById('nBody').value = '';
+  document.getElementById('nPinned').checked = false;
+}
+function editNotice(id) {
+  var n = _notices[id];
+  _editNotice = id;
+  document.getElementById('noticeFormTitle').textContent = '공지 수정';
+  document.getElementById('nTitle').value = n.title || '';
+  document.getElementById('nBody').value = n.body || '';
+  document.getElementById('nPinned').checked = !!n.pinned;
+  window.scrollTo(0, 0);
+}
+function saveNotice() {
+  var title = document.getElementById('nTitle').value.trim(), body = document.getElementById('nBody').value.trim();
+  if (!title || !body) { showToast('제목과 내용을 입력하세요'); return; }
+  var data = { title: title, body: body, pinned: document.getElementById('nPinned').checked, at: firebase.database.ServerValue.TIMESTAMP, by: _me.email };
+  var r = _editNotice ? _db.ref(P.ROOT + '/notices/' + _editNotice) : _db.ref(P.ROOT + '/notices').push();
+  r.set(data).then(function () { showToast('공지를 저장했습니다'); resetNoticeForm(); }, function (e) { showToast('실패: ' + e.message); });
+}
+function pinNotice(id, on) { done(_db.ref(P.ROOT + '/notices/' + id + '/pinned').set(on)); }
+function deleteNotice(id) {
+  if (!confirm('"' + _notices[id].title + '" 공지를 삭제할까요?')) return;
+  done(_db.ref(P.ROOT + '/notices/' + id).remove());
+}
+function loadDefaultNotices() {
+  var base = Date.now();
+  Promise.all(DEFAULT_NOTICES.map(function (n, i) {
+    return _db.ref(P.ROOT + '/notices').push().set({ title: n.title, body: n.body, pinned: n.pinned, at: base - i * 1000, by: _me.email });
+  })).then(function () { showToast('기본 공지를 불러왔습니다. 필요하면 수정하세요'); }, function (e) { showToast('실패: ' + e.message); });
+}
+
+// ── 휴일 ───────────────────────────────────
+function renderHolidays() {
+  var from = P.today(), to = P.addDays(from, 400), cd = can('day');
+  var keys = {};
+  Object.keys(P.HOLIDAYS).concat(Object.keys(_holidays)).forEach(function (k) { if (k >= from && k <= to) keys[k] = 1; });
+  var rows = Object.keys(keys).sort().map(function (k) {
+    var o = _holidays[k], base = P.HOLIDAYS[k];
+    var off = o === false;
+    var name = typeof o === 'string' ? o : base;
+    var src = typeof o === 'string' ? (base ? '수정' : '추가') : off ? '제외됨' : '기본';
+    var btns = !cd ? '' : off ? '<button class="btn" onclick="setHoliday(\'' + k + '\', null)">다시 휴일로</button>'
+      : (base ? '<button class="btn btn-danger" onclick="setHoliday(\'' + k + '\', false)">휴일에서 빼기</button>'
+              : '<button class="btn btn-danger" onclick="setHoliday(\'' + k + '\', null)">삭제</button>');
+    return '<div class="user"><div><div class="u-name"' + (off ? ' style="text-decoration:line-through;color:var(--text-muted)"' : '') + '>' +
+      P.label(k) + ' · ' + esc(name || '') + '</div><div class="u-sub">' + src + '</div></div><div class="u-ctrl">' + btns + '</div></div>';
+  }).join('');
+  document.getElementById('holidayList').innerHTML = rows || '<div class="empty">앞으로 1년 안의 휴일이 없습니다</div>';
+}
+function setHoliday(k, v) { done(_db.ref(P.ROOT + '/holidays/' + k).set(v)); }
+function addHoliday() {
+  var k = document.getElementById('hDate').value, name = document.getElementById('hName').value.trim();
+  if (!k || !name) { showToast('날짜와 이름을 입력하세요'); return; }
+  _db.ref(P.ROOT + '/holidays/' + k).set(name).then(function () {
+    document.getElementById('hDate').value = ''; document.getElementById('hName').value = '';
+    showToast('휴일을 추가했습니다. 이미 만들어진 주는 주간 배정 탭에서 신청일을 다시 계산하세요');
+  }, function (e) { showToast('실패: ' + e.message); });
+}
+
 // ── 관리자 지정 (마스터 전용) ──────────────────
-function permBoxes(prefix, cur) {
+function permBoxes(prefix) {
   return PERMS.map(function (p) {
-    return '<label class="chk" title="' + p.desc + '"><input type="checkbox" id="' + prefix + p.key + '"' +
-      (cur && cur[p.key] ? ' checked' : '') + ' />' + p.name + '</label>';
+    return '<label class="chk" title="' + p.desc + '"><input type="checkbox" id="' + prefix + p.key + '" />' + p.name + '</label>';
   }).join('');
 }
 function renderAdmins() {
@@ -315,7 +798,7 @@ function renderAdmins() {
     return '<option value="' + u + '">' + esc(_users[u].name) + ' (' + esc(_users[u].email) + ')</option>';
   }).join('');
   sel.value = cands.indexOf(keep) >= 0 ? keep : '';
-  if (!document.getElementById('newPerms').innerHTML) document.getElementById('newPerms').innerHTML = permBoxes('np-', null);
+  if (!document.getElementById('newPerms').innerHTML) document.getElementById('newPerms').innerHTML = permBoxes('np-');
 
   var ids = Object.keys(_admins);
   document.getElementById('adminList').innerHTML =
@@ -329,7 +812,8 @@ function renderAdmins() {
             ' onchange="setPerm(\'' + u + '\',\'' + pm.key + '\',this.checked)" />' + pm.name + '</label>';
         }).join('') +
         '<button class="btn btn-danger" onclick="removeAdmin(\'' + u + '\')">해제</button></div></div>';
-    }).join('');
+    }).join('') +
+    '<div class="note">' + PERMS.map(function (p) { return '<b>' + p.name + '</b>: ' + p.desc; }).join('<br>') + '</div>';
 }
 function addAdmin() {
   var uid = document.getElementById('newAdmin').value;
@@ -353,174 +837,10 @@ function removeAdmin(uid) {
   _db.ref(P.ROOT + '/admins/' + uid).remove().then(function () { showToast('해제했습니다'); });
 }
 
-// ── 직원 ────────────────────────────────────
-function renderUsers() {
-  var ids = Object.keys(_users);
-  var ok = ids.filter(function (u) { return _users[u].approved; });
-  var cnt = function (g) { return ok.filter(function (u) { return _users[u].group === g; }).length; };
-  var pend = ids.length - ok.length;
-  document.getElementById('userSummary').innerHTML =
-    '승인 <b>' + ok.length + '명</b> (홀수 ' + cnt('odd') + ' · 짝수 ' + cnt('even') + ') · 우선 배정 ' +
-    ok.filter(function (u) { return _users[u].priority; }).length + '명' +
-    (pend ? ' · <b style="color:var(--accent)">승인 대기 ' + pend + '명</b>' : '');
-
-  var q = document.getElementById('userSearch').value.trim().toLowerCase();
-  ids = ids.filter(function (u) {
-    var p = _users[u];
-    return !q || [p.name, p.plate, p.email].join(' ').toLowerCase().indexOf(q) >= 0;
-  }).sort(function (a, b) {
-    return (_users[a].approved ? 1 : 0) - (_users[b].approved ? 1 : 0) ||
-      String(_users[a].name).localeCompare(String(_users[b].name), 'ko');
-  });
-  var html = '', cu = can('users'), cp = can('priority');
-  ids.forEach(function (u) {
-    var p = _users[u];
-    html += '<div class="user' + (p.approved ? '' : ' pending') + '">' +
-      '<div><div class="u-name">' + esc(p.name) + ' · ' + esc(p.plate) + '</div><div class="u-sub">' + esc(p.email) + '</div></div>' +
-      '<div class="u-ctrl">' +
-        (cu ? '<select onchange="setUser(\'' + u + '\',\'group\',this.value)">' +
-          '<option value="odd"' + (p.group === 'odd' ? ' selected' : '') + '>홀수날</option>' +
-          '<option value="even"' + (p.group === 'even' ? ' selected' : '') + '>짝수날</option>' +
-        '</select>' : '<span class="badge">' + P.groupName(p.group) + '날</span>') +
-        (cp ? '<label class="chk"><input type="checkbox"' + (p.priority ? ' checked' : '') + ' onchange="setUser(\'' + u + '\',\'priority\',this.checked)" />우선</label>'
-          : (p.priority ? '<span class="badge">우선</span>' : '')) +
-        (cu ? (p.approved
-          ? '<button class="btn" onclick="setUser(\'' + u + '\',\'approved\',false)">승인 취소</button>'
-          : '<button class="btn btn-primary" onclick="setUser(\'' + u + '\',\'approved\',true)">승인</button>') +
-          '<button class="btn" onclick="editUser(\'' + u + '\')">수정</button>' +
-          '<button class="btn btn-danger" onclick="deleteUser(\'' + u + '\')">삭제</button>'
-          : (p.approved ? '' : '<span class="badge">승인 대기</span>')) +
-      '</div></div>';
-  });
-  document.getElementById('userList').innerHTML = html || '<div class="empty">등록된 직원이 없습니다</div>';
-}
-function setUser(uid, field, val) {
-  var upd = {};
-  upd[field] = (field === 'priority' && !val) ? null : val;
-  _db.ref(P.ROOT + '/users/' + uid).update(upd)
-    .then(function () { showToast('저장했습니다'); }, function (e) { showToast('저장 실패: ' + e.message); });
-}
-function editUser(uid) {
-  var p = _users[uid];
-  var name = prompt('이름', p.name); if (name === null) return;
-  var plate = prompt('차량번호', p.plate); if (plate === null) return;
-  _db.ref(P.ROOT + '/users/' + uid).update({ name: name.trim() || p.name, plate: plate.trim() || p.plate })
-    .then(function () { showToast('저장했습니다'); });
-}
-function deleteUser(uid) {
-  if (!confirm(_users[uid].name + ' 님의 등록을 삭제할까요? 지난 기록에는 이름이 "삭제됨"으로 표시됩니다.')) return;
-  _db.ref(P.ROOT + '/users/' + uid).remove().then(function () { showToast('삭제했습니다'); });
-}
-
-// ── 일자별 현황 ─────────────────────────────
-function shiftDay(n) {
-  var el = document.getElementById('dayPick');
-  el.value = P.addDays(el.value || P.today(), n);
-  watchDay();
-  pushNav();
-}
-function watchDay() {
-  var key = document.getElementById('dayPick').value || P.today();
-  if (_dayRef) _dayRef.off();
-  if (_reqRef) _reqRef.off();
-  _day = null; _reqCount = 0;
-  _dayRef = _db.ref(P.ROOT + '/days/' + key);
-  _dayRef.on('value', function (s) { _day = s.val(); renderDay(); });
-  _reqRef = _db.ref(P.ROOT + '/requests/' + key);
-  _reqRef.on('value', function (s) { _reqCount = Object.keys(s.val() || {}).length; renderDay(); });
-}
-function renderDay() {
-  var key = document.getElementById('dayPick').value;
-  if (!key) return;
-  var info = '<b>' + P.label(key) + '</b> · ' + P.groupName(P.dayGroup(key)) + '날 · 신청 ' + _reqCount + '명';
-  var board = '';
-  if (!_day || !_day.finalized) {
-    var due = P.now() >= P.deadline(key);
-    info += '<br>' + (due ? '마감이 지났지만 아직 배정이 실행되지 않았습니다. ' +
-      (can('day') ? '<button class="btn btn-primary" onclick="runFinalize()">지금 배정 확정</button>' : '')
-      : '전날 오후 3시에 배정이 확정됩니다.');
-    board = '<div class="empty">배정 전입니다</div>';
-  } else {
-    info += '<br>배정 확정 ' + fmtTime(_day.finalizedAt) + (_day.swept ? ' · 오전 9시 해제 처리됨' : '');
-    if (can('day') && key === P.today() && !_day.swept && P.now() >= P.releaseTime(key)) {
-      info += ' <button class="btn btn-primary" onclick="runSweep()">9시 해제 실행</button>';
-    }
-    board = boardHtml(key, _day);
-  }
-  document.getElementById('dayInfo').innerHTML = info;
-  document.getElementById('dayBoard').innerHTML = board;
-}
-function boardHtml(key, day) {
-  var seats = day.seats || {};
-  var out = '';
-  ['annex', 'nam', 'wait'].forEach(function (lot) {
-    var list = Object.keys(seats).filter(function (u) { return seats[u].lot === lot; })
-      .sort(function (a, b) { return rank(seats[a]) - rank(seats[b]) || (seats[a].order || 99) - (seats[b].order || 99); });
-    var holding = list.filter(function (u) { return /^(ok|in)$/.test(seats[u].status); }).length;
-    out += '<div class="lot-title ' + lot + '"><span>' + LOT_NAME[lot] + '</span><span>' +
-      (lot === 'wait' ? list.length + '명' : holding + ' / ' + P.LOTS[lot].cap) + '</span></div>';
-    if (!list.length) out += '<div class="empty">없음</div>';
-    list.forEach(function (u, i) {
-      var p = _users[u] || {}, s = seats[u];
-      var acts = '';
-      if (can('day')) {
-        if (s.status === 'ok') acts += act('주차 완료', 'adminCheckIn', u) + act('해제', 'adminRelease', u);
-        if (s.status === 'in') acts += act('반납 처리', 'adminReturn', u);
-        if (s.status === 'wait') acts += act('대기 취소', 'adminReturn', u);
-      }
-      out += '<div class="row"><span class="no">' + (lot === 'wait' ? s.order : i + 1) + '</span>' +
-        '<span class="nm">' + esc(p.name || '(삭제됨)') + ' <span class="pl">' + esc(p.plate || '') + '</span></span>' +
-        statusBadge(s) + acts + '</div>';
-    });
-  });
-  return out;
-}
-function act(text, fn, uid) { return '<button class="btn" onclick="' + fn + '(\'' + uid + '\')">' + text + '</button>'; }
-function rank(s) { return { 'in': 0, ok: 1, wait: 1, released: 2, returned: 3 }[s.status]; }
-function statusBadge(s) {
-  if (s.status === 'in') return '<span class="badge in">주차 완료' + (s.inAt ? ' ' + fmtTime(s.inAt, true) : '') + '</span>';
-  if (s.status === 'returned') return '<span class="badge off">반납</span>';
-  if (s.status === 'released') return '<span class="badge off">해제</span>';
-  if (s.status === 'ok') return '<span class="badge">' + (s.promotedAt ? '승계' : '배정') + '</span>';
-  return s.lateAt ? '<span class="badge">늦은 등록</span>' : '';
-}
-function dayKey() { return document.getElementById('dayPick').value; }
-function done(p) { p.then(function () { showToast('처리했습니다'); }, function (e) { showToast('실패: ' + e.message); }); }
-function adminCheckIn(u) { done(P.checkIn(_db, dayKey(), u)); }
-function adminRelease(u) { if (confirm('이 배정을 해제하고 대기자에게 넘길까요?')) done(P.release(_db, dayKey(), u, _users)); }
-function adminReturn(u) { if (confirm('반납(대기 취소) 처리할까요?')) done(P.returnSeat(_db, dayKey(), u, _users)); }
-function runFinalize() { done(P.ensureFinalized(_db, dayKey(), _users)); }
-function runSweep() { done(P.ensureSwept(_db, dayKey(), _users)); }
-
-// ── 월별 통계 ───────────────────────────────
-function loadStats() {
-  var ym = document.getElementById('monthPick').value;
-  if (!ym) return;
-  var last = P.addDays(P.addDays(ym + '-28', 4).slice(0, 8) + '01', -1);
-  P.readMonth(_db, last).then(function (days) {
-    var c = P.monthCounts(days, last, true);
-    var ids = Object.keys(_users).filter(function (u) { return _users[u].approved || c[u]; });
-    ids.sort(function (a, b) { return (c[b] || 0) - (c[a] || 0) || String((_users[a] || {}).name).localeCompare(String((_users[b] || {}).name), 'ko'); });
-    var nDays = Object.keys(days).filter(function (k) { return days[k].finalized; }).length;
-    var rows = ids.map(function (u) {
-      var p = _users[u] || {};
-      return '<tr><td>' + esc(p.name || '(삭제됨)') + '</td><td>' + P.groupName(p.group) + (p.priority ? ' · 우선' : '') + '</td><td class="num">' + (c[u] || 0) + '회</td></tr>';
-    }).join('');
-    document.getElementById('stats').innerHTML =
-      '<div class="summary" style="margin-bottom:8px;">배정이 확정된 날 ' + nDays + '일 · 이용 횟수는 반납을 빼고 미도착 해제는 포함합니다</div>' +
-      '<table><thead><tr><th>이름</th><th>그룹</th><th style="text-align:right">이용</th></tr></thead><tbody>' +
-      (rows || '<tr><td colspan="3" class="empty">기록이 없습니다</td></tr>') + '</tbody></table>';
-  });
-}
-
-function fmtTime(ms, short) {
+function fmtTime(ms) {
   if (!ms) return '';
   var d = new Date(ms + 9 * 3600000);
-  var hm = d.getUTCHours() + ':' + ('0' + d.getUTCMinutes()).slice(-2);
-  return short ? hm : (d.getUTCMonth() + 1) + '/' + d.getUTCDate() + ' ' + hm;
-}
-function esc(s) {
-  return String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return (d.getUTCMonth() + 1) + '/' + d.getUTCDate() + ' ' + d.getUTCHours() + ':' + ('0' + d.getUTCMinutes()).slice(-2);
 }
 function showToast(msg) {
   var t = document.getElementById('toast');

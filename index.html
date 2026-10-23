@@ -4,12 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CGN 주차 신청</title>
-  <meta name="description" content="별관 8면 · 남경 5면 주차 신청 (주차일 전날 오후 3시 마감)" />
+  <meta name="description" content="별관 8면 · 남경 5면 주간 주차 신청 (매주 금요일 오후 2시~2시 30분)" />
   <meta property="og:title" content="CGN 주차 신청" />
-  <meta property="og:description" content="별관 8면 · 남경 5면 · 주차일 전날 오후 3시 신청 마감" />
+  <meta property="og:description" content="별관 8면 · 남경 5면 · 매주 금요일 오후 2시~2시 30분 다음 주 신청" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://cgn210-alt.github.io/cgn-parking/" />
-  <meta property="og:image" content="https://cgn210-alt.github.io/cgn-parking/parking-og.png?v=1" />
+  <meta property="og:image" content="https://cgn210-alt.github.io/cgn-parking/parking-og.png?v=2" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -26,7 +26,7 @@
       --danger:#9c1a1a; --font:'Noto Sans KR',sans-serif;
     }
     body { font-family:var(--font); background:var(--bg); color:var(--text-primary); min-height:100vh; -webkit-font-smoothing:antialiased; }
-    .wrap { max-width:520px; margin:0 auto; padding:0 0 40px; }
+    .wrap { max-width:560px; margin:0 auto; padding:0 0 40px; }
     .center { display:flex; align-items:center; justify-content:center; min-height:100vh; padding:24px 16px; }
     .card-box { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:28px 24px; width:100%; max-width:360px; }
     .box-title { font-size:18px; font-weight:700; text-align:center; margin-bottom:6px; }
@@ -36,7 +36,7 @@
     .btn { font-family:var(--font); font-size:14px; font-weight:500; border-radius:var(--radius); padding:10px 14px; cursor:pointer; border:1px solid var(--border); background:var(--surface-sub); color:var(--text-primary); }
     .btn-primary { background:var(--accent); border-color:var(--accent); color:#fff; }
     .btn-block { width:100%; margin-top:4px; padding:12px; }
-    .btn:disabled { opacity:0.5; cursor:default; }
+    .btn:disabled { opacity:0.45; cursor:default; }
     .link { font-size:12.5px; color:var(--text-secondary); text-align:center; margin-top:14px; }
     .link a { color:var(--accent); cursor:pointer; text-decoration:underline; }
     .msg { font-size:12.5px; margin-top:10px; text-align:center; line-height:1.5; }
@@ -51,25 +51,38 @@
     .header-title { font-size:15px; font-weight:700; }
     .header-sub { font-size:11.5px; color:var(--text-muted); margin-top:2px; }
     .btn-sm { font-size:12px; padding:6px 12px; }
-    .section { padding:16px 16px 0; }
-    .section-title { font-size:12px; font-weight:700; color:var(--text-muted); margin-bottom:8px; }
+    .tabs { display:flex; gap:6px; padding:12px 16px 0; }
+    .tabs .btn { flex:1; font-size:13px; padding:8px 4px; }
+    .section { padding:12px 16px 0; }
+    .section-title { font-size:12px; font-weight:700; color:var(--text-muted); margin:4px 0 8px; }
     .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px; margin-bottom:10px; }
-    .day-head { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px; }
+    .day-head { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px; gap:8px; }
     .day-name { font-size:15px; font-weight:700; }
     .day-tag { font-size:11.5px; color:var(--text-muted); }
-    .status { font-size:20px; font-weight:700; margin-bottom:4px; }
+    .status { font-size:19px; font-weight:700; margin-bottom:4px; }
     .status.annex { color:var(--annex); } .status.nam { color:var(--nam); } .status.wait { color:var(--wait); } .status.none { color:var(--text-muted); }
-    .note { font-size:12.5px; color:var(--text-secondary); line-height:1.6; margin-bottom:10px; }
+    .note { font-size:12.5px; color:var(--text-secondary); line-height:1.6; margin:6px 0 10px; }
     .actions { display:flex; gap:8px; flex-wrap:wrap; }
-    .req-row { display:flex; align-items:center; gap:10px; padding:10px 0; border-top:1px solid var(--border); }
-    .req-row:first-child { border-top:none; padding-top:0; }
-    .req-info { flex:1; min-width:0; }
-    .req-date { font-size:14px; font-weight:500; }
-    .req-sub { font-size:11.5px; color:var(--text-muted); margin-top:2px; }
     .btn-on { background:var(--accent-bg); border-color:var(--accent); color:var(--accent); font-weight:700; }
-    .count-num { font-size:26px; font-weight:700; color:var(--accent); }
-    .tabs { display:flex; gap:6px; margin-bottom:10px; }
-    .tabs .btn { flex:1; font-size:13px; padding:8px; }
+    .timeline { display:flex; gap:6px; margin:10px 0 12px; }
+    .timeline div { flex:1; text-align:center; font-size:11.5px; color:var(--text-muted); background:var(--surface-sub); border-radius:8px; padding:6px 2px; line-height:1.45; }
+    .timeline div b { display:block; font-size:13px; color:var(--text-primary); }
+    .timeline div.now { background:var(--accent-bg); color:var(--accent); }
+    .timeline div.now b { color:var(--accent); }
+    .pick { display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid var(--border); border-radius:10px; margin-bottom:6px; cursor:pointer; }
+    .pick input { width:20px; height:20px; accent-color:var(--accent); }
+    .pick .pd { flex:1; font-size:14px; font-weight:500; }
+    .pick .ps { font-size:11.5px; color:var(--text-muted); }
+    .pick.on { border-color:var(--accent); background:var(--accent-bg); }
+    .countdown { font-size:13px; font-weight:700; color:var(--accent); }
+    .res { display:flex; align-items:center; gap:8px; padding:9px 0; border-top:1px solid var(--surface-sub); font-size:13.5px; }
+    .res:first-child { border-top:none; }
+    .res .rd { flex:1; }
+    .tag { font-size:12px; font-weight:700; padding:3px 9px; border-radius:10px; }
+    .tag.annex { background:var(--annex-bg); color:var(--annex); } .tag.nam { background:var(--nam-bg); color:var(--nam); }
+    .tag.wait { background:var(--wait-bg); color:var(--wait); } .tag.none { background:var(--surface-sub); color:var(--text-muted); }
+    .chips { display:flex; gap:6px; overflow-x:auto; padding-bottom:4px; margin-bottom:10px; }
+    .chips .btn { font-size:12.5px; padding:6px 10px; white-space:nowrap; }
     .lot-title { font-size:13px; font-weight:700; margin:12px 0 6px; display:flex; justify-content:space-between; }
     .lot-title:first-child { margin-top:0; }
     .lot-title.annex { color:var(--annex); } .lot-title.nam { color:var(--nam); } .lot-title.wait { color:var(--wait); }
@@ -81,7 +94,25 @@
     .badge { font-size:11px; padding:2px 7px; border-radius:10px; background:var(--surface-sub); color:var(--text-muted); white-space:nowrap; }
     .badge.in { background:var(--nam-bg); color:var(--nam); }
     .badge.off { text-decoration:line-through; }
+    .badge.pin { background:var(--accent-bg); color:var(--accent); }
     .empty { font-size:12.5px; color:var(--text-muted); padding:6px 0; }
+    .summary { font-size:13px; color:var(--text-secondary); line-height:1.7; margin-bottom:10px; }
+    .summary b { color:var(--text-primary); }
+    .mystat { display:grid; grid-template-columns:repeat(3, 1fr); gap:6px; margin-bottom:6px; }
+    .mystat > div { background:var(--surface-sub); border-radius:8px; padding:8px; text-align:center; }
+    .mystat .k { font-size:11.5px; color:var(--text-muted); }
+    .mystat .v { font-size:16px; font-weight:700; }
+    .tbl { overflow-x:auto; margin-bottom:6px; }
+    table { width:100%; border-collapse:collapse; font-size:12.5px; white-space:nowrap; }
+    th, td { text-align:left; padding:6px 5px; border-top:1px solid var(--border); }
+    th { font-size:11.5px; color:var(--text-muted); font-weight:500; border-top:none; }
+    td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; }
+    tr.me td { background:var(--accent-bg); }
+    .notice { padding:12px 0; border-top:1px solid var(--border); }
+    .notice:first-child { border-top:none; padding-top:0; }
+    .n-title { font-size:14px; font-weight:700; margin-bottom:4px; }
+    .n-body { font-size:13px; color:var(--text-secondary); line-height:1.65; }
+    .n-meta { font-size:11px; color:var(--text-muted); margin-top:4px; }
     .toast { position:fixed; top:70px; left:50%; transform:translateX(-50%) translateY(-10px); background:#1a1916; color:#fff; font-size:13px; padding:10px 20px; border-radius:20px; opacity:0; transition:opacity 0.2s, transform 0.2s; z-index:100; pointer-events:none; max-width:90vw; text-align:center; }
     .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
     .hidden { display:none !important; }
@@ -126,14 +157,14 @@
 <div class="center hidden" id="profileScreen">
   <div class="card-box">
     <div class="box-title">주차 등록</div>
-    <div class="box-sub">관리자가 확인 후 승인하면 신청할 수 있습니다</div>
+    <div class="box-sub">이번 달 이용할 그룹(홀수날/짝수날)을 고르세요.<br>관리자가 확인 후 승인하면 신청할 수 있습니다.</div>
     <input class="input" id="pfName" placeholder="이름" />
     <input class="input" id="pfPlate" placeholder="차량번호 (예: 12가 3456)" />
     <div class="seg">
       <label><input type="radio" name="pfGroup" value="odd" /><span>홀수날</span></label>
       <label><input type="radio" name="pfGroup" value="even" /><span>짝수날</span></label>
     </div>
-    <button class="btn btn-primary btn-block" onclick="saveProfile()">등록 요청</button>
+    <button class="btn btn-primary btn-block" onclick="saveProfile()">승인 요청</button>
     <div class="msg err" id="pfMsg"></div>
     <div class="link"><a onclick="doLogout()">로그아웃</a></div>
   </div>
@@ -144,6 +175,7 @@
   <div class="card-box">
     <div class="box-title">승인 대기 중</div>
     <div class="box-sub">관리자가 등록 내용을 확인하고 있습니다. 승인되면 이 화면이 자동으로 바뀝니다.</div>
+    <div id="pendingNotices"></div>
     <div class="link"><a onclick="doLogout()">로그아웃</a></div>
   </div>
 </div>
@@ -157,31 +189,45 @@
     </div>
     <button class="btn btn-sm" onclick="doLogout()">로그아웃</button>
   </div>
-
-  <div class="section">
-    <div class="section-title">나의 배정</div>
-    <div id="myDays"></div>
+  <div class="tabs">
+    <button class="btn" id="tab-apply" onclick="setTab('apply')">신청</button>
+    <button class="btn" id="tab-board" onclick="setTab('board')">현황</button>
+    <button class="btn" id="tab-stats" onclick="setTab('stats')">통계</button>
+    <button class="btn" id="tab-notice" onclick="setTab('notice')">공지</button>
   </div>
 
-  <div class="section">
-    <div class="section-title">주차 신청 (주차일 전날 오후 3시 마감)</div>
-    <div class="card" id="reqList"></div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">이번 달 나의 이용</div>
-    <div class="card">
-      <span class="count-num" id="myCount">0</span> 회
-      <div class="note" style="margin:6px 0 0;">이용 횟수가 적은 사람부터 배정되며, 매월 1일에 초기화됩니다. 반납한 날은 횟수에 들어가지 않습니다.</div>
+  <div id="pane-apply">
+    <div class="section" id="pinnedBox"></div>
+    <div class="section">
+      <div class="section-title">다음 주 주차 신청</div>
+      <div class="card" id="weekCard"></div>
+    </div>
+    <div class="section">
+      <div class="section-title">나의 배정</div>
+      <div id="myDays"></div>
+    </div>
+    <div class="section">
+      <div class="section-title">월별 그룹 (홀수날 / 짝수날)</div>
+      <div class="card" id="groupCard"></div>
     </div>
   </div>
 
-  <div class="section">
-    <div class="section-title">주차 현황</div>
+  <div class="section hidden" id="pane-board">
     <div class="card">
-      <div class="tabs" id="boardTabs"></div>
+      <div class="chips" id="boardChips"></div>
       <div id="board"></div>
     </div>
+  </div>
+
+  <div class="section hidden" id="pane-stats">
+    <div class="card">
+      <input class="input" type="month" id="monthPick" style="width:auto;" onchange="loadStats(); pushNav()" />
+      <div id="stats"><div class="empty">불러오는 중...</div></div>
+    </div>
+  </div>
+
+  <div class="section hidden" id="pane-notice">
+    <div class="card" id="noticeList"></div>
   </div>
 </div>
 
@@ -189,18 +235,17 @@
 
 <script src="firebase-config.js"></script>
 <script src="parking-core.js"></script>
+<script src="parking-ui.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
-var P = Parking;
-var REQ_DAYS = 7;          // 앞으로 며칠까지 미리 신청할 수 있는지
-var _db = null, _me = null, _user = null;
-var _users = {}, _days = {}, _reqs = {};
-var _usersRef = null, _daysRef = null, _reqRefs = [], _meRef = null;
-var _boardKey = null, _signup = false;
-var LOT_NAME = { annex: '별관', nam: '남경', wait: '대기' };
+var P = Parking, U = ParkingUI, esc = U.esc;
+var _db = null, _user = null, _me = null, _meRef = null;
+var _users = {}, _days = {}, _week = null, _app = null, _holidays = {}, _notices = {}, _waivers = {};
+var _refs = [], _daysRef = null, _wk = null, _tab = 'apply', _boardKey = null, _signup = false;
+var _picks = null;   // 신청 화면에서 체크 중인 날짜 (저장 전)
 
 window.addEventListener('load', function () {
   if (typeof FIREBASE_CONFIG === 'undefined' || !FIREBASE_CONFIG.apiKey) { show('setupScreen'); return; }
@@ -213,16 +258,24 @@ window.addEventListener('load', function () {
     _user = u;
     if (!u) { show('authScreen'); return; }
     if (!u.emailVerified) { document.getElementById('verifyEmail').textContent = u.email; show('verifyScreen'); return; }
+    listenNotices();
     _meRef = _db.ref(P.ROOT + '/users/' + u.uid);
     _meRef.on('value', function (s) {
       _me = s.val();
       if (!_me) { show('profileScreen'); return; }
-      if (!_me.approved) { show('pendingScreen'); stopMain(); return; }
+      if (!_me.approved) { show('pendingScreen'); stopMain(); renderNotices(); return; }
       show('mainScreen');
       startMain();
     }, function () { show('pendingScreen'); });
   });
-  setInterval(tick, 30000);
+  setInterval(tick, 15000);
+  // 남은 시간은 매초 글자만 바꾸고, 신청 단계가 바뀌는 순간에만 신청 칸을 다시 그림 (체크 중 깜빡임 방지)
+  setInterval(function () {
+    if (!_wk) return;
+    if (weekPhase() !== _phase) { renderWeek(); return; }
+    var els = document.querySelectorAll('.countdown[data-to]');
+    for (var i = 0; i < els.length; i++) els[i].textContent = els[i].getAttribute('data-pre') + fmtLeft(+els[i].getAttribute('data-to') - P.now());
+  }, 1000);
 });
 
 function show(id) {
@@ -296,33 +349,49 @@ function saveProfile() {
     .catch(function (e) { msg.textContent = '등록 실패: ' + e.message; });
 }
 
-// ── 메인 데이터 ──────────────────────────────
-function startMain() {
-  if (_usersRef) { render(); return; }
-  _usersRef = _db.ref(P.ROOT + '/users');
-  _usersRef.on('value', function (s) { _users = s.val() || {}; tick(); });
-  listenDays();
+// ── 데이터 ──────────────────────────────────
+function on(path, fn) {
+  var r = _db.ref(P.ROOT + '/' + path);
+  r.on('value', function (s) { fn(s.val()); }, function () {});
+  _refs.push(r);
+  return r;
 }
-function listenDays() {
-  var t = P.today();
-  var start = t.slice(0, 8) + '01', end = P.addDays(t, 1);
-  if (_daysRef && _daysRef._range === start + end) return;
+function listenNotices() {
+  on('notices', function (v) { _notices = v || {}; renderNotices(); render(); });
+}
+function startMain() {
+  if (_wk) { render(); return; }
+  on('users', function (v) { var first = !Object.keys(_users).length; _users = v || {}; if (first) tick(); else render(); });
+  on('holidays', function (v) { _holidays = v || {}; render(); });
+  document.getElementById('monthPick').value = P.today().slice(0, 7);
+  var nav = readNav();
+  if (nav.tab) _tab = nav.tab;
+  if (nav.day) _boardKey = nav.day;
+  if (nav.ym) document.getElementById('monthPick').value = nav.ym;
+  setTab(_tab, true);
+  history.replaceState(null, '', navHash());
+  listenRange();
+}
+// 다음 주 신청·배정과 이번 달 기록을 실시간으로 받음 (주가 바뀌면 다시 연결)
+function listenRange() {
+  var wk = P.nextWeek();
+  if (wk === _wk) return;
+  _wk = wk; _picks = null;
   if (_daysRef) _daysRef.off();
-  _daysRef = _db.ref(P.ROOT + '/days').orderByKey().startAt(start).endAt(end);
-  _daysRef._range = start + end;
-  _daysRef.on('value', function (s) { _days = s.val() || {}; render(); });
-  _reqRefs.forEach(function (r) { r.off(); });
-  _reqRefs = []; _reqs = {};
-  for (var i = 1; i <= REQ_DAYS + 1; i++) (function (key) {
-    var r = _db.ref(P.ROOT + '/requests/' + key + '/' + _user.uid);
-    r.on('value', function (s) { _reqs[key] = !!s.val(); render(); });
-    _reqRefs.push(r);
-  })(P.addDays(t, i));
+  var from = P.today().slice(0, 8) + '01';
+  if (P.mondayOf(P.today()) < from) from = P.mondayOf(P.today());
+  _daysRef = _db.ref(P.ROOT + '/days').orderByKey().startAt(from).endAt(P.addDays(wk, 6));
+  _daysRef.on('value', function (s) { _days = s.val() || {}; render(); }, function () {});
+  on('weeks/' + wk, function (v) { _week = v; render(); });
+  var wq = _db.ref(P.ROOT + '/waivers').orderByKey().startAt(P.addDays(wk, -7)).endAt(P.addDays(wk, -1));
+  wq.on('value', function (s) { _waivers = s.val() || {}; render(); }, function () {});
+  _refs.push(wq);
+  on('apps/' + wk + '/' + _user.uid, function (v) { _app = v; render(); });
 }
 function stopMain() {
-  if (_usersRef) { _usersRef.off(); _usersRef = null; }
+  _refs.forEach(function (r) { r.off(); }); _refs = [];
   if (_daysRef) { _daysRef.off(); _daysRef = null; }
-  _reqRefs.forEach(function (r) { r.off(); }); _reqRefs = [];
+  _wk = null;
 }
 function detach() {
   stopMain();
@@ -330,90 +399,161 @@ function detach() {
   _me = null;
 }
 
-// 마감·해제 시각이 지났으면 배정 확정과 오전 9시 해제를 실행
+// 시간이 된 단계 진행: 다음 주 일정 만들기, 오후 4시 발표, 오전 9시 해제
 function tick() {
-  if (!_usersRef || !_me || !_me.approved) return;
-  listenDays();
-  var t = P.today();
-  P.ensureFinalized(_db, t, _users)
-    .then(function () { return P.ensureFinalized(_db, P.addDays(t, 1), _users); })
-    .then(function () { return P.ensureSwept(_db, t, _users); })
-    .catch(function (e) { console.error(e); });
-  render();
+  if (!_wk || !_me || !_me.approved) return;
+  listenRange();
+  P.advance(_db, _users, false).catch(function (e) { console.error(e); });
+  if (weekPhase() !== 1) render();   // 신청 중에는 체크 화면을 건드리지 않음
 }
 
 // ── 화면 ────────────────────────────────────
 function render() {
-  if (!_me || !_me.approved) return;
-  var t = P.today(), uid = _user.uid;
-  document.getElementById('meLine').textContent = _me.name + ' · ' + _me.plate + ' · ' + P.groupName(_me.group) + '날' + (_me.priority ? ' · 우선 배정' : '');
+  if (!_me || !_me.approved || !_wk) return;
+  var t = P.today();
+  document.getElementById('meLine').textContent = _me.name + ' · ' + _me.plate + ' · ' + (+t.slice(5, 7)) + '월 ' +
+    P.groupName(P.groupOf(_me, t)) + '날' + (_me.priority ? ' · 우선 배정' : '');
+  renderPinned();
+  renderWeek();
+  renderMyDays();
+  renderGroup();
+  renderBoard();
+}
 
-  // 나의 배정 (오늘, 그리고 확정된 내일)
-  var html = '';
-  [t, P.addDays(t, 1)].forEach(function (key) {
-    var day = _days[key];
-    if (key !== t && !(day && day.finalized)) return;
-    html += myDayCard(key, day, uid, key === t);
-  });
-  document.getElementById('myDays').innerHTML = html;
+function renderPinned() {
+  var pinned = U.sortedNotices(_notices).filter(function (n) { return n.pinned; });
+  document.getElementById('pinnedBox').innerHTML = pinned.length
+    ? '<div class="section-title">공지</div><div class="card">' + pinned.map(function (n) { return U.noticeHtml(n); }).join('') + '</div>' : '';
+}
 
-  // 신청 목록
-  var rows = '';
-  for (var i = 1; i <= REQ_DAYS + 1; i++) {
-    var key = P.addDays(t, i);
-    if (P.now() >= P.deadline(key)) continue;
-    var on = !!_reqs[key];
-    var mine = _me.priority || _me.group === P.dayGroup(key);
-    var dl = new Date(P.deadline(key) + 9 * 3600000);
-    rows += '<div class="req-row"><div class="req-info">' +
-      '<div class="req-date">' + P.label(key) + ' · ' + P.groupName(P.dayGroup(key)) + '날</div>' +
-      '<div class="req-sub">' + (mine ? '별관 우선 대상' : '남경 대상') + ' · ' + (dl.getUTCMonth() + 1) + '/' + dl.getUTCDate() + ' 오후 3시 마감</div>' +
-      '</div><button class="btn ' + (on ? 'btn-on' : '') + '" onclick="toggleReq(\'' + key + '\',' + !on + ')">' + (on ? '신청됨' : '신청') + '</button></div>';
+function weekDates() {
+  return _week && _week.days ? Object.keys(_week.days).sort() : P.weekDays(_wk, _holidays);
+}
+function fmtLeft(ms) {
+  var s = Math.max(0, Math.floor(ms / 1000)), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60);
+  return (h ? h + '시간 ' : '') + m + '분 ' + (s % 60) + '초';
+}
+
+var _phase = -1;
+// 0 신청 전, 1 신청 중, 2 마감(발표 전), 3 발표됨
+function weekPhase() {
+  var sc = P.schedule(_wk), t = P.now();
+  return t < sc.openAt ? 0 : t < sc.closeAt ? 1 : t < sc.publishAt || !(_week && _week.publishedAt) ? 2 : 3;
+}
+function countdown(to, pre) {
+  return '<span class="countdown" data-to="' + to + '" data-pre="' + pre + '">' + pre + fmtLeft(to - P.now()) + '</span>';
+}
+
+function renderWeek() {
+  var el = document.getElementById('weekCard');
+  if (!el || !_wk) return;
+  var sc = P.schedule(_wk), t = P.now(), dates = weekDates();
+  var fri = P.addDays(_wk, -3);
+  var phase = _phase = weekPhase();
+  var head = '<div class="day-head"><span class="day-name">' + P.shortLabel(_wk) + ' ~ ' + P.shortLabel(P.addDays(_wk, 4)) + '</span>' +
+    '<span class="day-tag">하루 별관 ' + P.LOTS.annex.cap + ' · 남경 ' + P.LOTS.nam.cap + '</span></div>';
+  var tl = '<div class="timeline">' +
+    '<div class="' + (phase === 1 ? 'now' : '') + '"><b>' + P.hm(sc.openAt).replace('오후 ', '') + '</b>신청 시작</div>' +
+    '<div class="' + (phase === 2 ? 'now' : '') + '"><b>' + P.hm(sc.closeAt).replace('오후 ', '') + '</b>신청 마감</div>' +
+    '<div class="' + (phase === 3 ? 'now' : '') + '"><b>' + P.hm(sc.publishAt).replace('오후 ', '') + '</b>결과 발표</div></div>';
+  var info = '<div class="note">' + P.label(fri) + ' 오후 기준 (인터넷 시간). 토요일·주일·공휴일은 신청을 받지 않습니다.</div>';
+  var body = '';
+  var chosen = (_app && _app.dates) || {};
+  var pen = P.penalized(_wk, _days, _waivers)[_user.uid];
+  var penNote = pen ? '<div class="note" style="color:var(--danger)"><b>미도착 패널티:</b> ' + pen.map(P.shortLabel).join(', ') +
+    ' 배정을 반납 없이 이용하지 않아 이번 신청(' + P.shortLabel(_wk) + ' 주)은 배정에서 제외됩니다. 사정이 있었다면 관리자에게 면제를 요청하세요.</div>' : '';
+
+  if (!dates.length) {
+    body = '<div class="status none">신청일 없음</div><div class="note">다음 주는 평일이 모두 휴일이라 신청을 받지 않습니다.</div>';
+  } else if (phase === 0) {
+    body = '<div class="status none">신청 전</div><div class="note">' + P.label(fri) + ' 오후 2시에 신청 버튼이 열립니다.' +
+      (t > sc.openAt - 3 * 3600000 ? ' ' + countdown(sc.openAt, '시작까지 ') : '') + '</div>' + holidayNote(dates);
+  } else if (phase === 1) {
+    if (!_picks) { _picks = {}; Object.keys(chosen).forEach(function (k) { _picks[k] = true; }); }
+    var ready = _week && _week.openAt;
+    body = '<div class="note">주차가 필요한 날을 모두 고르고 <b>신청 저장</b>을 누르세요. 마감 전까지 몇 번이든 바꿀 수 있습니다. ' +
+      countdown(sc.closeAt, '마감까지 ') + '</div>' +
+      dates.map(function (k) {
+        var mine = _me.priority || P.groupOf(_me, k) === P.dayGroup(k);
+        return '<label class="pick' + (_picks[k] ? ' on' : '') + '"><input type="checkbox"' + (_picks[k] ? ' checked' : '') +
+          ' onchange="togglePick(\'' + k + '\', this.checked)" /><span class="pd">' + P.label(k) + '</span>' +
+          '<span class="ps">' + P.groupName(P.dayGroup(k)) + '날 · ' + (mine ? '별관 우선' : '남경 대상') + '</span></label>';
+      }).join('') + holidayNote(dates) +
+      '<div class="actions" style="margin-top:8px;"><button class="btn btn-primary" style="flex:1" ' + (ready ? '' : 'disabled') +
+      ' onclick="saveApp()">신청 저장</button></div>' +
+      '<div class="note">' + (ready ? (Object.keys(chosen).length ? '저장된 신청: ' + Object.keys(chosen).sort().map(P.shortLabel).join(', ') : '아직 저장된 신청이 없습니다.') : '신청 준비 중입니다. 잠시 후 다시 열립니다.') + '</div>';
+  } else if (phase === 2) {
+    body = '<div class="status none">신청 마감</div><div class="note">오후 4시에 배정 결과가 발표되고 회사 메일로도 안내됩니다.</div>' +
+      '<div class="note">나의 신청: ' + (Object.keys(chosen).length ? Object.keys(chosen).sort().map(P.shortLabel).join(', ') : '없음') + '</div>';
+  } else {
+    var rows = dates.map(function (k) {
+      var s = _days[k] && _days[k].seats && _days[k].seats[_user.uid];
+      return '<div class="res"><span class="rd">' + P.label(k) + '</span>' + (!s && chosen[k] && pen ? '<span class="tag none">패널티 제외</span>' : seatTag(s, chosen[k])) + '</div>';
+    }).join('');
+    body = '<div class="status ' + (rows.indexOf('tag annex') >= 0 || rows.indexOf('tag nam') >= 0 ? 'annex' : 'none') + '">배정 결과 발표</div>' + rows +
+      '<div class="note">대기 순번은 앞사람이 반납하거나 오전 9시 미도착 해제가 생기면 자동으로 올라갑니다.</div>';
   }
-  document.getElementById('reqList').innerHTML = rows || '<div class="empty">신청할 수 있는 날짜가 없습니다</div>';
+  el.innerHTML = head + tl + (phase < 3 ? penNote : '') + body + (phase < 3 ? info : '');
+}
+function holidayNote(dates) {
+  var off = [];
+  for (var i = 0; i < 5; i++) { var k = P.addDays(_wk, i); if (dates.indexOf(k) < 0) off.push(P.shortLabel(k) + ' ' + (P.holidayName(k, _holidays) || '휴일')); }
+  return off.length ? '<div class="note">신청 제외: ' + off.join(', ') + '</div>' : '';
+}
+function seatTag(s, asked) {
+  if (!s) return '<span class="tag none">' + (asked ? '미배정' : '신청 안 함') + '</span>';
+  if (s.lot === 'wait') return '<span class="tag wait">대기 ' + s.order + '번</span>';
+  if (s.status === 'returned') return '<span class="tag none">' + U.LOT_NAME[s.lot] + ' 반납</span>';
+  if (s.status === 'released') return '<span class="tag none">' + U.LOT_NAME[s.lot] + ' 해제</span>';
+  return '<span class="tag ' + s.lot + '">' + U.LOT_NAME[s.lot] + (s.status === 'in' ? ' 주차 완료' : '') + '</span>';
+}
+function togglePick(k, on) { _picks[k] = on; renderWeek(); }
+function saveApp() {
+  var dates = {};
+  Object.keys(_picks || {}).forEach(function (k) { if (_picks[k]) dates[k] = true; });
+  var r = _db.ref(P.ROOT + '/apps/' + _wk + '/' + _user.uid);
+  (Object.keys(dates).length ? r.set({ dates: dates, at: firebase.database.ServerValue.TIMESTAMP }) : r.remove())
+    .then(function () { showToast(Object.keys(dates).length ? Object.keys(dates).length + '일 신청을 저장했습니다' : '신청을 모두 취소했습니다'); },
+          function () { showToast('저장하지 못했습니다. 신청 시간이 지났을 수 있습니다'); });
+}
 
-  document.getElementById('myCount').textContent = P.monthCounts(_days, t, true)[uid] || 0;
-
-  // 현황판
-  if (!_boardKey || (_boardKey !== t && _boardKey !== P.addDays(t, 1))) _boardKey = location.hash === '#tomorrow' ? P.addDays(t, 1) : t;
-  var tabs = '';
-  [t, P.addDays(t, 1)].forEach(function (key, i) {
-    tabs += '<button class="btn ' + (key === _boardKey ? 'btn-on' : '') + '" onclick="setBoard(\'' + key + '\')">' + (i ? '내일 ' : '오늘 ') + P.label(key) + '</button>';
+// 오늘부터 확정된 배정 (이번 주 + 발표된 다음 주)
+function renderMyDays() {
+  var t = P.today(), uid = _user.uid, html = '';
+  Object.keys(_days).filter(function (k) { return k >= t && _days[k] && _days[k].finalized; }).sort().forEach(function (k) {
+    var s = _days[k].seats && _days[k].seats[uid];
+    if (!s && k !== t) return;
+    html += myDayCard(k, _days[k], uid, k === t);
   });
-  document.getElementById('boardTabs').innerHTML = tabs;
-  document.getElementById('board').innerHTML = boardHtml(_boardKey, _days[_boardKey], uid);
+  document.getElementById('myDays').innerHTML = html || '<div class="card"><div class="empty">확정된 배정이 없습니다.</div></div>';
 }
 
 function myDayCard(key, day, uid, isToday) {
-  var head = '<div class="day-head"><span class="day-name">' + (isToday ? '오늘 ' : '내일 ') + P.label(key) + '</span><span class="day-tag">' + P.groupName(P.dayGroup(key)) + '날</span></div>';
-  if (!day || !day.finalized) {
-    return '<div class="card">' + head + '<div class="status none">배정 없음</div><div class="note">이 날은 배정이 확정되지 않았습니다.</div></div>';
-  }
+  var head = '<div class="day-head"><span class="day-name">' + (isToday ? '오늘 ' : '') + P.label(key) + '</span><span class="day-tag">' + P.groupName(P.dayGroup(key)) + '날</span></div>';
   var s = day.seats && day.seats[uid];
-  var past9 = isToday && P.now() >= P.releaseTime(key);
   var st = '', note = '', act = '';
   if (!s) {
-    st = '<div class="status none">신청 안 함</div>';
-    note = '빈자리가 생기면 차례대로 배정됩니다. 대기 등록하면 마지막 순번에 들어갑니다.';
+    st = '<div class="status none">배정 없음</div>';
+    note = '오늘 주차가 필요하면 대기 등록하세요. 빈자리가 생기면 차례대로 배정됩니다.';
     act = btn('대기 등록', 'doLate(\'' + key + '\')', true);
   } else if (s.lot === 'wait') {
     st = '<div class="status wait">대기 ' + s.order + '번</div>';
-    note = '앞 순번에서 반납하거나 오전 9시에 미도착 해제가 생기면 자동으로 배정됩니다.';
+    note = '앞 순번에서 반납하거나 오전 9시 미도착 해제가 생기면 자동으로 배정됩니다.';
     act = btn('대기 취소', 'doReturn(\'' + key + '\', \'대기를 취소할까요?\')');
   } else {
-    var lot = LOT_NAME[s.lot];
+    var lot = U.LOT_NAME[s.lot];
     if (s.status === 'returned') { st = '<div class="status none">' + lot + ' 반납함</div>'; note = '반납한 날은 이용 횟수에 들어가지 않습니다.'; }
-    else if (s.status === 'released') { st = '<div class="status none">' + lot + ' 해제됨</div>'; note = '오전 9시까지 주차 완료 확인이 없어 다른 사람에게 넘어갔습니다.'; }
-    else if (s.status === 'in') { st = '<div class="status ' + s.lot + '">' + lot + ' 주차 완료</div>'; note = '일찍 나가면 반납해 주세요. 대기자에게 자리가 넘어갑니다.'; act = btn('반납', 'doReturn(\'' + key + '\', \'' + lot + ' 자리를 반납할까요?\')'); }
+    else if (s.status === 'released') { st = '<div class="status none">' + lot + ' 해제됨</div>'; note = '오전 9시까지 주차 완료 확인이 없어 다른 사람에게 넘어갔습니다. 미도착 패널티로 다음 주 배정에서 제외됩니다.'; }
+    else if (s.status === 'in') { st = '<div class="status ' + s.lot + '">' + lot + ' 주차 완료</div>'; note = s.lot === 'annex' ? '별관은 주차 후 퇴근 시까지 출차가 어렵습니다.' : '일찍 나가면 반납해 주세요. 대기자에게 자리가 넘어갑니다.'; if (s.lot !== 'annex') act = btn('반납', 'doReturn(\'' + key + '\', \'' + lot + ' 자리를 반납할까요?\')'); }
     else {
       st = '<div class="status ' + s.lot + '">' + lot + ' 배정' + (s.promotedAt ? ' (대기에서 승계)' : '') + '</div>';
       if (isToday) {
-        note = (s.promotedAt >= P.at(key, 0)) ? '도착하면 주차 완료를 눌러주세요.'
-          : '오전 9시까지 도착해서 주차 완료를 눌러주세요. 누르지 않으면 자동 해제됩니다.';
+        note = (s.promotedAt >= P.at(key, 0)) ? '도착하면 주차 완료를 눌러주세요.' : '오전 9시까지 도착해서 주차 완료를 눌러주세요. 누르지 않으면 자동 해제됩니다.';
         act = btn('주차 완료', 'doCheckIn(\'' + key + '\')', true);
       } else {
         note = '못 오게 되면 미리 반납해 주세요. 대기자에게 자리가 넘어갑니다.';
       }
+      if (s.lot === 'annex') note += ' 별관은 주차 후 퇴근 시까지 출차가 어렵습니다.';
       act += btn('반납', 'doReturn(\'' + key + '\', \'' + lot + ' 자리를 반납할까요?\')');
     }
   }
@@ -423,55 +563,86 @@ function btn(text, onclick, primary) {
   return '<button class="btn ' + (primary ? 'btn-primary' : '') + '" onclick="' + onclick + '">' + text + '</button>';
 }
 
-function boardHtml(key, day, uid) {
-  if (!day || !day.finalized) {
-    return '<div class="empty">' + P.label(key) + ' 배정은 전날 오후 3시에 확정됩니다.</div>';
-  }
-  var seats = day.seats || {};
-  var out = '';
-  ['annex', 'nam', 'wait'].forEach(function (lot) {
-    var list = Object.keys(seats).filter(function (u) { return seats[u].lot === lot; })
-      .sort(function (a, b) { return rank(seats[a]) - rank(seats[b]) || (seats[a].order || 99) - (seats[b].order || 99); });
-    var holding = list.filter(function (u) { return /^(ok|in)$/.test(seats[u].status); }).length;
-    out += '<div class="lot-title ' + lot + '"><span>' + LOT_NAME[lot] + '</span><span>' +
-      (lot === 'wait' ? list.length + '명' : holding + ' / ' + P.LOTS[lot].cap) + '</span></div>';
-    if (!list.length) out += '<div class="empty">없음</div>';
-    list.forEach(function (u, i) {
-      var p = _users[u] || {}, s = seats[u];
-      out += '<div class="row' + (u === uid ? ' me' : '') + '"><span class="no">' + (lot === 'wait' ? s.order : i + 1) + '</span>' +
-        '<span class="nm">' + esc(p.name || '(삭제됨)') + '</span><span class="pl">' + esc(p.plate || '') + '</span>' + statusBadge(s) + '</div>';
-    });
+// 월별 그룹: 이번 달 그룹 표시, 다음 달 그룹 승인 요청
+function renderGroup() {
+  var t = P.today(), ym = t.slice(0, 7), next = P.addMonths(ym, 1);
+  var cur = P.groupOf(_me, t);
+  var approvedNext = _me.groups && _me.groups[next];
+  var req = _me.groupReq && _me.groupReq[next];
+  var shown = approvedNext || req || P.groupOf(_me, next + '-01');
+  var state = approvedNext ? '승인됨' : req ? '승인 대기' : '이번 달 그룹 유지 (변경하려면 아래에서 선택)';
+  document.getElementById('groupCard').innerHTML =
+    '<div class="summary">' + (+ym.slice(5)) + '월: <b>' + P.groupName(cur) + '날</b> 그룹 · 그날은 별관을 먼저 배정받습니다.</div>' +
+    '<div class="day-head"><span class="day-name">' + (+next.slice(5)) + '월 그룹</span><span class="day-tag">' + state + '</span></div>' +
+    '<div class="actions">' +
+      '<button class="btn ' + (shown === 'odd' ? 'btn-on' : '') + '" style="flex:1" onclick="reqGroup(\'' + next + '\',\'odd\')">홀수날</button>' +
+      '<button class="btn ' + (shown === 'even' ? 'btn-on' : '') + '" style="flex:1" onclick="reqGroup(\'' + next + '\',\'even\')">짝수날</button>' +
+    '</div><div class="note">관리자가 홀수·짝수 인원이 한쪽에 몰리지 않도록 확인한 뒤 승인합니다.</div>';
+}
+function reqGroup(ym, g) {
+  _db.ref(P.ROOT + '/users/' + _user.uid + '/groupReq/' + ym).set(g)
+    .then(function () { showToast((+ym.slice(5)) + '월 ' + P.groupName(g) + '날 그룹을 요청했습니다'); }, fail);
+}
+
+// 현황판
+function renderBoard() {
+  var t = P.today();
+  var keys = Object.keys(_days).filter(function (k) { return k >= P.mondayOf(t) && _days[k] && _days[k].finalized; }).sort();
+  if (!_boardKey || keys.indexOf(_boardKey) < 0) _boardKey = keys.indexOf(t) >= 0 ? t : (keys.filter(function (k) { return k >= t; })[0] || keys[keys.length - 1]);
+  document.getElementById('boardChips').innerHTML = keys.map(function (k) {
+    return '<button class="btn ' + (k === _boardKey ? 'btn-on' : '') + '" onclick="setBoard(\'' + k + '\')">' + (k === t ? '오늘 ' : '') + P.shortLabel(k) + '</button>';
+  }).join('');
+  document.getElementById('board').innerHTML = _boardKey
+    ? '<div class="note" style="margin-top:0">' + P.label(_boardKey) + ' · ' + P.groupName(P.dayGroup(_boardKey)) + '날</div>' + U.boardHtml(_days[_boardKey], _users, { me: _user.uid })
+    : '<div class="empty">확정된 배정이 없습니다. 결과는 금요일 오후 4시에 발표됩니다.</div>';
+}
+function setBoard(k) { _boardKey = k; renderBoard(); pushNav(); }
+
+function loadStats() {
+  var ym = document.getElementById('monthPick').value || P.today().slice(0, 7);
+  U.loadStats(_db, ym).then(function (st) {
+    document.getElementById('stats').innerHTML = U.statsHtml(ym, st, _users, _user.uid);
+  }, function () { document.getElementById('stats').innerHTML = '<div class="empty">통계를 불러오지 못했습니다</div>'; });
+}
+
+function renderNotices() {
+  var list = U.sortedNotices(_notices);
+  var html = list.length ? list.map(function (n) { return U.noticeHtml(n); }).join('') : '<div class="empty">공지가 없습니다</div>';
+  document.getElementById('noticeList').innerHTML = html;
+  document.getElementById('pendingNotices').innerHTML = list.length ? '<div class="card" style="text-align:left">' + html + '</div>' : '';
+}
+
+// ── 탭과 뒤로 가기 (주소 # 에 남겨서 휴대폰 뒤로 가기로 앞 화면에 돌아가게 함) ──
+function setTab(t, fromNav) {
+  _tab = t;
+  ['apply', 'board', 'stats', 'notice'].forEach(function (k) {
+    document.getElementById('pane-' + k).classList.toggle('hidden', k !== t);
+    document.getElementById('tab-' + k).classList.toggle('btn-on', k === t);
   });
-  return out;
+  if (t === 'stats') loadStats();
+  if (!fromNav) pushNav();
 }
-function rank(s) { return { 'in': 0, ok: 1, wait: 1, released: 2, returned: 3 }[s.status]; }
-function statusBadge(s) {
-  if (s.status === 'in') return '<span class="badge in">주차 완료</span>';
-  if (s.status === 'returned') return '<span class="badge off">반납</span>';
-  if (s.status === 'released') return '<span class="badge off">해제</span>';
-  if (s.status === 'ok') return '<span class="badge">' + (s.promotedAt ? '승계' : '배정') + '</span>';
-  return '';
+function navHash() {
+  if (_tab === 'board' && _boardKey) return '#board/' + _boardKey;
+  if (_tab === 'stats') return '#stats/' + document.getElementById('monthPick').value;
+  return '#' + _tab;
 }
-// 현황판 오늘/내일 탭을 주소(#)에 남겨서 휴대폰 뒤로 가기로 앞 탭에 돌아가게 함
-function setBoard(key) {
-  _boardKey = key;
-  var h = key === P.today() ? '#today' : '#tomorrow';
-  if (location.hash !== h) history.pushState(null, '', h);
-  render();
+function readNav() {
+  var m = location.hash.match(/^#(apply|board|stats|notice)(?:\/([\d-]+))?$/);
+  if (!m) return {};
+  return { tab: m[1], day: m[1] === 'board' ? m[2] : null, ym: m[1] === 'stats' ? m[2] : null };
 }
+function pushNav() { if (location.hash !== navHash()) history.pushState(null, '', navHash()); }
 window.addEventListener('popstate', function () {
-  _boardKey = location.hash === '#tomorrow' ? P.addDays(P.today(), 1) : P.today();
+  if (!_wk) return;
+  var nav = readNav();
+  if (nav.day) _boardKey = nav.day;
+  if (nav.ym) document.getElementById('monthPick').value = nav.ym;
+  setTab(nav.tab || 'apply', true);
   render();
 });
 
 // ── 동작 ────────────────────────────────────
-function toggleReq(key, on) {
-  if (P.now() >= P.deadline(key)) { showToast('신청이 마감되었습니다'); return; }
-  var r = _db.ref(P.ROOT + '/requests/' + key + '/' + _user.uid);
-  (on ? r.set(firebase.database.ServerValue.TIMESTAMP) : r.remove())
-    .then(function () { showToast(on ? P.label(key) + ' 신청했습니다' : '신청을 취소했습니다'); })
-    .catch(function () { showToast('처리하지 못했습니다. 마감되었을 수 있습니다'); });
-}
 function doCheckIn(key) {
   P.checkIn(_db, key, _user.uid).then(function () { showToast('주차 완료로 표시했습니다'); }, fail);
 }
@@ -484,9 +655,6 @@ function doLate(key) {
 }
 function fail() { showToast('처리하지 못했습니다. 잠시 후 다시 시도하세요'); }
 
-function esc(s) {
-  return String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
 function showToast(msg) {
   var t = document.getElementById('toast');
   t.textContent = msg;

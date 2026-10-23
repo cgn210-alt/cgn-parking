@@ -1,0 +1,38 @@
+name: 주간 주차 배정
+
+# 매주 금요일 (시간은 UTC, 한국 시간 = UTC + 9)
+# GitHub 예약 실행은 몇 분 늦을 수 있어서 미리 시작해 두고, 스크립트가 정확한 시각까지 기다립니다.
+on:
+  schedule:
+    - cron: '0 4 * * 5'    # 13:00 다음 주 신청 일정 만들기
+    - cron: '15 5 * * 5'   # 14:15 시작 → 14:30 마감 직후 배정안
+    - cron: '30 6 * * 5'   # 15:30 시작 → 16:00 발표 + 결과 메일
+    - cron: '0 8 * * 5'    # 17:00 놓친 단계·메일 다시 확인
+  workflow_dispatch:
+
+concurrency:
+  group: weekly-parking
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: 준비
+        working-directory: scripts
+        run: npm install --no-audit --no-fund
+      - name: 실행
+        run: node scripts/weekly.js
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_DATABASE_URL: https://cgn-parking-default-rtdb.asia-southeast1.firebasedatabase.app
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
