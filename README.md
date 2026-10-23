@@ -34,7 +34,7 @@
 
 | 이름 | 값 |
 |---|---|
-| `FIREBASE_SERVICE_ACCOUNT` | Firebase 콘솔 > 프로젝트 설정 > 서비스 계정 > '새 비공개 키 생성'으로 받은 JSON 파일 내용 전체 |
+| `FIREBASE_DB_SECRET` | Firebase 콘솔 > 프로젝트 설정 > 서비스 계정 > 데이터베이스 비밀번호에 나오는 값 (회사 조직 정책으로 서비스 계정 키를 만들 수 없어 이 방식을 씁니다) |
 | `SMTP_HOST`, `SMTP_PORT` | 메일 서버 (예: 구글 계정이면 `smtp.gmail.com`, `465`) |
 | `SMTP_USER`, `SMTP_PASS` | 발송 계정과 비밀번호 (구글 계정이면 앱 비밀번호) |
 | `MAIL_FROM` | 보내는 사람 표시 (예: `CGN 주차 <계정@gmail.com>`), 비우면 SMTP_USER |
