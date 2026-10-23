@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CGN 주차 신청</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:#f5f4f1; --surface:#ffffff; --surface-sub:#f9f8f6;
+      --border:#e4e2dc; --text-primary:#1a1916; --text-secondary:#5c5a55; --text-muted:#9c9990;
+      --accent:#d9480f; --accent-bg:#fff1e8; --radius:10px;
+      --annex:#1a4f9c; --annex-bg:#eef3fb; --nam:#1e7a46; --nam-bg:#e9f6ee; --wait:#8a6d00; --wait-bg:#fdf6dd;
+      --danger:#9c1a1a; --font:'Noto Sans KR',sans-serif;
+    }
+    body { font-family:var(--font); background:var(--bg); color:var(--text-primary); min-height:100vh; -webkit-font-smoothing:antialiased; }
+    .wrap { max-width:520px; margin:0 auto; padding:0 0 40px; }
+    .center { display:flex; align-items:center; justify-content:center; min-height:100vh; padding:24px 16px; }
+    .card-box { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:28px 24px; width:100%; max-width:360px; }
+    .box-title { font-size:18px; font-weight:700; text-align:center; margin-bottom:6px; }
+    .box-sub { font-size:12.5px; color:var(--text-muted); text-align:center; margin-bottom:20px; line-height:1.6; }
+    .input { width:100%; font-family:var(--font); font-size:15px; background:var(--surface-sub); border:1px solid var(--border); border-radius:var(--radius); padding:11px 14px; outline:none; margin-bottom:8px; }
+    .input:focus { border-color:var(--accent); }
+    .btn { font-family:var(--font); font-size:14px; font-weight:500; border-radius:var(--radius); padding:10px 14px; cursor:pointer; border:1px solid var(--border); background:var(--surface-sub); color:var(--text-primary); }
+    .btn-primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+    .btn-block { width:100%; margin-top:4px; padding:12px; }
+    .btn:disabled { opacity:0.5; cursor:default; }
+    .link { font-size:12.5px; color:var(--text-secondary); text-align:center; margin-top:14px; }
+    .link a { color:var(--accent); cursor:pointer; text-decoration:underline; }
+    .msg { font-size:12.5px; margin-top:10px; text-align:center; line-height:1.5; }
+    .msg.err { color:var(--danger); }
+    .seg { display:flex; gap:6px; margin-bottom:8px; }
+    .seg label { flex:1; text-align:center; font-size:14px; padding:10px; border:1px solid var(--border); border-radius:var(--radius); background:var(--surface-sub); cursor:pointer; }
+    .seg input { display:none; }
+    .seg input:checked + span { color:var(--accent); font-weight:700; }
+    .seg label:has(input:checked) { border-color:var(--accent); background:var(--accent-bg); }
+
+    .header { background:var(--surface); border-bottom:1px solid var(--border); padding:14px 16px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:10; }
+    .header-title { font-size:15px; font-weight:700; }
+    .header-sub { font-size:11.5px; color:var(--text-muted); margin-top:2px; }
+    .btn-sm { font-size:12px; padding:6px 12px; }
+    .section { padding:16px 16px 0; }
+    .section-title { font-size:12px; font-weight:700; color:var(--text-muted); margin-bottom:8px; }
+    .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px; margin-bottom:10px; }
+    .day-head { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px; }
+    .day-name { font-size:15px; font-weight:700; }
+    .day-tag { font-size:11.5px; color:var(--text-muted); }
+    .status { font-size:20px; font-weight:700; margin-bottom:4px; }
+    .status.annex { color:var(--annex); } .status.nam { color:var(--nam); } .status.wait { color:var(--wait); } .status.none { color:var(--text-muted); }
+    .note { font-size:12.5px; color:var(--text-secondary); line-height:1.6; margin-bottom:10px; }
+    .actions { display:flex; gap:8px; flex-wrap:wrap; }
+    .req-row { display:flex; align-items:center; gap:10px; padding:10px 0; border-top:1px solid var(--border); }
+    .req-row:first-child { border-top:none; padding-top:0; }
+    .req-info { flex:1; min-width:0; }
+    .req-date { font-size:14px; font-weight:500; }
+    .req-sub { font-size:11.5px; color:var(--text-muted); margin-top:2px; }
+    .btn-on { background:var(--accent-bg); border-color:var(--accent); color:var(--accent); font-weight:700; }
+    .count-num { font-size:26px; font-weight:700; color:var(--accent); }
+    .tabs { display:flex; gap:6px; margin-bottom:10px; }
+    .tabs .btn { flex:1; font-size:13px; padding:8px; }
+    .lot-title { font-size:13px; font-weight:700; margin:12px 0 6px; display:flex; justify-content:space-between; }
+    .lot-title:first-child { margin-top:0; }
+    .lot-title.annex { color:var(--annex); } .lot-title.nam { color:var(--nam); } .lot-title.wait { color:var(--wait); }
+    .row { display:flex; align-items:center; gap:8px; font-size:13px; padding:6px 0; border-top:1px solid var(--surface-sub); }
+    .row .no { width:22px; color:var(--text-muted); font-size:12px; }
+    .row .nm { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .row .pl { color:var(--text-secondary); font-size:12.5px; }
+    .row.me { background:var(--accent-bg); border-radius:6px; padding-left:4px; }
+    .badge { font-size:11px; padding:2px 7px; border-radius:10px; background:var(--surface-sub); color:var(--text-muted); white-space:nowrap; }
+    .badge.in { background:var(--nam-bg); color:var(--nam); }
+    .badge.off { text-decoration:line-through; }
+    .empty { font-size:12.5px; color:var(--text-muted); padding:6px 0; }
+    .toast { position:fixed; top:70px; left:50%; transform:translateX(-50%) translateY(-10px); background:#1a1916; color:#fff; font-size:13px; padding:10px 20px; border-radius:20px; opacity:0; transition:opacity 0.2s, transform 0.2s; z-index:100; pointer-events:none; max-width:90vw; text-align:center; }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+    .hidden { display:none !important; }
+  </style>
+</head>
+<body>
+
+<!-- 설정 전 안내 -->
+<div class="center hidden" id="setupScreen">
+  <div class="card-box">
+    <div class="box-title">설정이 필요합니다</div>
+    <div class="box-sub">firebase-config.js 에 Firebase 설정값을 입력해야 앱이 동작합니다. README.md 를 참고하세요.</div>
+  </div>
+</div>
+
+<!-- 로그인 / 가입 -->
+<div class="center hidden" id="authScreen">
+  <div class="card-box">
+    <div class="box-title">CGN 주차 신청</div>
+    <div class="box-sub" id="authSub">회사 이메일로 로그인하세요</div>
+    <input class="input" type="email" id="email" placeholder="회사 이메일" />
+    <input class="input" type="password" id="pw" placeholder="비밀번호 (6자 이상)" onkeydown="if(event.key==='Enter')submitAuth()" />
+    <button class="btn btn-primary btn-block" id="authBtn" onclick="submitAuth()">로그인</button>
+    <div class="msg err" id="authMsg"></div>
+    <div class="link" id="authSwitch"></div>
+  </div>
+</div>
+
+<!-- 메일 인증 대기 -->
+<div class="center hidden" id="verifyScreen">
+  <div class="card-box">
+    <div class="box-title">메일 인증이 필요합니다</div>
+    <div class="box-sub"><span id="verifyEmail"></span> 으로 보낸 인증 메일의 링크를 누른 뒤 아래 버튼을 눌러주세요.</div>
+    <button class="btn btn-primary btn-block" onclick="recheckVerify()">인증 완료했어요</button>
+    <button class="btn btn-block" onclick="resendVerify()">인증 메일 다시 보내기</button>
+    <div class="msg" id="verifyMsg"></div>
+    <div class="link"><a onclick="doLogout()">로그아웃</a></div>
+  </div>
+</div>
+
+<!-- 첫 등록 -->
+<div class="center hidden" id="profileScreen">
+  <div class="card-box">
+    <div class="box-title">주차 등록</div>
+    <div class="box-sub">관리자가 확인 후 승인하면 신청할 수 있습니다</div>
+    <input class="input" id="pfName" placeholder="이름" />
+    <input class="input" id="pfPlate" placeholder="차량번호 (예: 12가 3456)" />
+    <div class="seg">
+      <label><input type="radio" name="pfGroup" value="odd" /><span>홀수날</span></label>
+      <label><input type="radio" name="pfGroup" value="even" /><span>짝수날</span></label>
+    </div>
+    <button class="btn btn-primary btn-block" onclick="saveProfile()">등록 요청</button>
+    <div class="msg err" id="pfMsg"></div>
+    <div class="link"><a onclick="doLogout()">로그아웃</a></div>
+  </div>
+</div>
+
+<!-- 승인 대기 -->
+<div class="center hidden" id="pendingScreen">
+  <div class="card-box">
+    <div class="box-title">승인 대기 중</div>
+    <div class="box-sub">관리자가 등록 내용을 확인하고 있습니다. 승인되면 이 화면이 자동으로 바뀝니다.</div>
+    <div class="link"><a onclick="doLogout()">로그아웃</a></div>
+  </div>
+</div>
+
+<!-- 메인 -->
+<div class="wrap hidden" id="mainScreen">
+  <div class="header">
+    <div>
+      <div class="header-title">CGN 주차 신청</div>
+      <div class="header-sub" id="meLine"></div>
+    </div>
+    <button class="btn btn-sm" onclick="doLogout()">로그아웃</button>
+  </div>
+
+  <div class="section">
+    <div class="section-title">나의 배정</div>
+    <div id="myDays"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">주차 신청 (주차일 전날 오후 3시 마감)</div>
+    <div class="card" id="reqList"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">이번 달 나의 이용</div>
+    <div class="card">
+      <span class="count-num" id="myCount">0</span> 회
+      <div class="note" style="margin:6px 0 0;">이용 횟수가 적은 사람부터 배정되며, 매월 1일에 초기화됩니다. 반납한 날은 횟수에 들어가지 않습니다.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">주차 현황</div>
+    <div class="card">
+      <div class="tabs" id="boardTabs"></div>
+      <div id="board"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="firebase-config.js"></script>
+<script src="parking-core.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+var P = Parking;
+var REQ_DAYS = 7;          // 앞으로 며칠까지 미리 신청할 수 있는지
+var _db = null, _me = null, _user = null;
+var _users = {}, _days = {}, _reqs = {};
+var _usersRef = null, _daysRef = null, _reqRefs = [], _meRef = null;
+var _boardKey = null, _signup = false;
+var LOT_NAME = { annex: '별관', nam: '남경', wait: '대기' };
+
+window.addEventListener('load', function () {
+  if (typeof FIREBASE_CONFIG === 'undefined' || !FIREBASE_CONFIG.apiKey) { show('setupScreen'); return; }
+  firebase.initializeApp(FIREBASE_CONFIG);
+  _db = firebase.database();
+  _db.ref('.info/serverTimeOffset').on('value', function (s) { P.setOffset(s.val()); });
+  renderAuthMode();
+  firebase.auth().onAuthStateChanged(function (u) {
+    detach();
+    _user = u;
+    if (!u) { show('authScreen'); return; }
+    if (!u.emailVerified) { document.getElementById('verifyEmail').textContent = u.email; show('verifyScreen'); return; }
+    _meRef = _db.ref(P.ROOT + '/users/' + u.uid);
+    _meRef.on('value', function (s) {
+      _me = s.val();
+      if (!_me) { show('profileScreen'); return; }
+      if (!_me.approved) { show('pendingScreen'); stopMain(); return; }
+      show('mainScreen');
+      startMain();
+    }, function () { show('pendingScreen'); });
+  });
+  setInterval(tick, 30000);
+});
+
+function show(id) {
+  ['setupScreen','authScreen','verifyScreen','profileScreen','pendingScreen','mainScreen'].forEach(function (s) {
+    document.getElementById(s).classList.toggle('hidden', s !== id);
+  });
+}
+
+// ── 로그인 / 가입 ─────────────────────────────
+function renderAuthMode() {
+  document.getElementById('authBtn').textContent = _signup ? '가입하기' : '로그인';
+  document.getElementById('authSub').textContent = _signup ? '회사 이메일(' + ALLOWED_EMAIL_DOMAIN + ')로 가입합니다' : '회사 이메일로 로그인하세요';
+  document.getElementById('authSwitch').innerHTML = _signup
+    ? '이미 가입했나요? <a onclick="toggleAuth()">로그인</a>'
+    : '처음이신가요? <a onclick="toggleAuth()">가입하기</a> · <a onclick="resetPw()">비밀번호 찾기</a>';
+  document.getElementById('authMsg').textContent = '';
+}
+function toggleAuth() { _signup = !_signup; renderAuthMode(); }
+
+function submitAuth() {
+  var email = document.getElementById('email').value.trim().toLowerCase();
+  var pw = document.getElementById('pw').value;
+  var msg = document.getElementById('authMsg');
+  msg.textContent = '';
+  if (!email || !pw) { msg.textContent = '이메일과 비밀번호를 입력하세요'; return; }
+  if (_signup) {
+    if (!email.endsWith(ALLOWED_EMAIL_DOMAIN)) { msg.textContent = '회사 이메일(' + ALLOWED_EMAIL_DOMAIN + ')만 가입할 수 있습니다'; return; }
+    firebase.auth().createUserWithEmailAndPassword(email, pw)
+      .then(function (c) { return c.user.sendEmailVerification(); })
+      .catch(function (e) { msg.textContent = authError(e); });
+  } else {
+    firebase.auth().signInWithEmailAndPassword(email, pw)
+      .catch(function (e) { msg.textContent = authError(e); });
+  }
+}
+function authError(e) {
+  var c = e && e.code || '';
+  if (c.indexOf('email-already-in-use') >= 0) return '이미 가입된 이메일입니다';
+  if (c.indexOf('weak-password') >= 0) return '비밀번호는 6자 이상이어야 합니다';
+  if (c.indexOf('invalid-email') >= 0) return '이메일 형식이 올바르지 않습니다';
+  return '이메일 또는 비밀번호가 올바르지 않습니다';
+}
+function resetPw() {
+  var email = document.getElementById('email').value.trim();
+  var msg = document.getElementById('authMsg');
+  if (!email) { msg.textContent = '이메일을 입력한 뒤 다시 눌러주세요'; return; }
+  firebase.auth().sendPasswordResetEmail(email)
+    .then(function () { msg.textContent = '비밀번호 재설정 메일을 보냈습니다'; })
+    .catch(function () { msg.textContent = '메일을 보내지 못했습니다'; });
+}
+function recheckVerify() {
+  _user.reload().then(function () { return _user.getIdToken(true); }).then(function () {
+    if (_user.emailVerified) location.reload();
+    else document.getElementById('verifyMsg').textContent = '아직 인증되지 않았습니다';
+  });
+}
+function resendVerify() {
+  _user.sendEmailVerification()
+    .then(function () { document.getElementById('verifyMsg').textContent = '인증 메일을 다시 보냈습니다'; })
+    .catch(function () { document.getElementById('verifyMsg').textContent = '잠시 후 다시 시도하세요'; });
+}
+function doLogout() { firebase.auth().signOut(); }
+
+function saveProfile() {
+  var name = document.getElementById('pfName').value.trim();
+  var plate = document.getElementById('pfPlate').value.trim();
+  var g = document.querySelector('input[name="pfGroup"]:checked');
+  var msg = document.getElementById('pfMsg');
+  if (!name || !plate || !g) { msg.textContent = '이름, 차량번호, 홀수/짝수를 모두 입력하세요'; return; }
+  _meRef.set({ name: name, plate: plate, group: g.value, email: _user.email, approved: false, createdAt: firebase.database.ServerValue.TIMESTAMP })
+    .catch(function (e) { msg.textContent = '등록 실패: ' + e.message; });
+}
+
+// ── 메인 데이터 ──────────────────────────────
+function startMain() {
+  if (_usersRef) { render(); return; }
+  _usersRef = _db.ref(P.ROOT + '/users');
+  _usersRef.on('value', function (s) { _users = s.val() || {}; tick(); });
+  listenDays();
+}
+function listenDays() {
+  var t = P.today();
+  var start = t.slice(0, 8) + '01', end = P.addDays(t, 1);
+  if (_daysRef && _daysRef._range === start + end) return;
+  if (_daysRef) _daysRef.off();
+  _daysRef = _db.ref(P.ROOT + '/days').orderByKey().startAt(start).endAt(end);
+  _daysRef._range = start + end;
+  _daysRef.on('value', function (s) { _days = s.val() || {}; render(); });
+  _reqRefs.forEach(function (r) { r.off(); });
+  _reqRefs = []; _reqs = {};
+  for (var i = 1; i <= REQ_DAYS + 1; i++) (function (key) {
+    var r = _db.ref(P.ROOT + '/requests/' + key + '/' + _user.uid);
+    r.on('value', function (s) { _reqs[key] = !!s.val(); render(); });
+    _reqRefs.push(r);
+  })(P.addDays(t, i));
+}
+function stopMain() {
+  if (_usersRef) { _usersRef.off(); _usersRef = null; }
+  if (_daysRef) { _daysRef.off(); _daysRef = null; }
+  _reqRefs.forEach(function (r) { r.off(); }); _reqRefs = [];
+}
+function detach() {
+  stopMain();
+  if (_meRef) { _meRef.off(); _meRef = null; }
+  _me = null;
+}
+
+// 마감·해제 시각이 지났으면 배정 확정과 오전 9시 해제를 실행
+function tick() {
+  if (!_usersRef || !_me || !_me.approved) return;
+  listenDays();
+  var t = P.today();
+  P.ensureFinalized(_db, t, _users)
+    .then(function () { return P.ensureFinalized(_db, P.addDays(t, 1), _users); })
+    .then(function () { return P.ensureSwept(_db, t, _users); })
+    .catch(function (e) { console.error(e); });
+  render();
+}
+
+// ── 화면 ────────────────────────────────────
+function render() {
+  if (!_me || !_me.approved) return;
+  var t = P.today(), uid = _user.uid;
+  document.getElementById('meLine').textContent = _me.name + ' · ' + _me.plate + ' · ' + P.groupName(_me.group) + '날' + (_me.priority ? ' · 우선 배정' : '');
+
+  // 나의 배정 (오늘, 그리고 확정된 내일)
+  var html = '';
+  [t, P.addDays(t, 1)].forEach(function (key) {
+    var day = _days[key];
+    if (key !== t && !(day && day.finalized)) return;
+    html += myDayCard(key, day, uid, key === t);
+  });
+  document.getElementById('myDays').innerHTML = html;
+
+  // 신청 목록
+  var rows = '';
+  for (var i = 1; i <= REQ_DAYS + 1; i++) {
+    var key = P.addDays(t, i);
+    if (P.now() >= P.deadline(key)) continue;
+    var on = !!_reqs[key];
+    var mine = _me.priority || _me.group === P.dayGroup(key);
+    var dl = new Date(P.deadline(key) + 9 * 3600000);
+    rows += '<div class="req-row"><div class="req-info">' +
+      '<div class="req-date">' + P.label(key) + ' · ' + P.groupName(P.dayGroup(key)) + '날</div>' +
+      '<div class="req-sub">' + (mine ? '별관 우선 대상' : '남경 대상') + ' · ' + (dl.getUTCMonth() + 1) + '/' + dl.getUTCDate() + ' 오후 3시 마감</div>' +
+      '</div><button class="btn ' + (on ? 'btn-on' : '') + '" onclick="toggleReq(\'' + key + '\',' + !on + ')">' + (on ? '신청됨' : '신청') + '</button></div>';
+  }
+  document.getElementById('reqList').innerHTML = rows || '<div class="empty">신청할 수 있는 날짜가 없습니다</div>';
+
+  document.getElementById('myCount').textContent = P.monthCounts(_days, t, true)[uid] || 0;
+
+  // 현황판
+  if (!_boardKey || (_boardKey !== t && _boardKey !== P.addDays(t, 1))) _boardKey = t;
+  var tabs = '';
+  [t, P.addDays(t, 1)].forEach(function (key, i) {
+    tabs += '<button class="btn ' + (key === _boardKey ? 'btn-on' : '') + '" onclick="setBoard(\'' + key + '\')">' + (i ? '내일 ' : '오늘 ') + P.label(key) + '</button>';
+  });
+  document.getElementById('boardTabs').innerHTML = tabs;
+  document.getElementById('board').innerHTML = boardHtml(_boardKey, _days[_boardKey], uid);
+}
+
+function myDayCard(key, day, uid, isToday) {
+  var head = '<div class="day-head"><span class="day-name">' + (isToday ? '오늘 ' : '내일 ') + P.label(key) + '</span><span class="day-tag">' + P.groupName(P.dayGroup(key)) + '날</span></div>';
+  if (!day || !day.finalized) {
+    return '<div class="card">' + head + '<div class="status none">배정 없음</div><div class="note">이 날은 배정이 확정되지 않았습니다.</div></div>';
+  }
+  var s = day.seats && day.seats[uid];
+  var past9 = isToday && P.now() >= P.releaseTime(key);
+  var st = '', note = '', act = '';
+  if (!s) {
+    st = '<div class="status none">신청 안 함</div>';
+    note = '빈자리가 생기면 차례대로 배정됩니다. 대기 등록하면 마지막 순번에 들어갑니다.';
+    act = btn('대기 등록', 'doLate(\'' + key + '\')', true);
+  } else if (s.lot === 'wait') {
+    st = '<div class="status wait">대기 ' + s.order + '번</div>';
+    note = '앞 순번에서 반납하거나 오전 9시에 미도착 해제가 생기면 자동으로 배정됩니다.';
+    act = btn('대기 취소', 'doReturn(\'' + key + '\', \'대기를 취소할까요?\')');
+  } else {
+    var lot = LOT_NAME[s.lot];
+    if (s.status === 'returned') { st = '<div class="status none">' + lot + ' 반납함</div>'; note = '반납한 날은 이용 횟수에 들어가지 않습니다.'; }
+    else if (s.status === 'released') { st = '<div class="status none">' + lot + ' 해제됨</div>'; note = '오전 9시까지 주차 완료 확인이 없어 다른 사람에게 넘어갔습니다.'; }
+    else if (s.status === 'in') { st = '<div class="status ' + s.lot + '">' + lot + ' 주차 완료</div>'; note = '일찍 나가면 반납해 주세요. 대기자에게 자리가 넘어갑니다.'; act = btn('반납', 'doReturn(\'' + key + '\', \'' + lot + ' 자리를 반납할까요?\')'); }
+    else {
+      st = '<div class="status ' + s.lot + '">' + lot + ' 배정' + (s.promotedAt ? ' (대기에서 승계)' : '') + '</div>';
+      if (isToday) {
+        note = (s.promotedAt >= P.at(key, 0)) ? '도착하면 주차 완료를 눌러주세요.'
+          : '오전 9시까지 도착해서 주차 완료를 눌러주세요. 누르지 않으면 자동 해제됩니다.';
+        act = btn('주차 완료', 'doCheckIn(\'' + key + '\')', true);
+      } else {
+        note = '못 오게 되면 미리 반납해 주세요. 대기자에게 자리가 넘어갑니다.';
+      }
+      act += btn('반납', 'doReturn(\'' + key + '\', \'' + lot + ' 자리를 반납할까요?\')');
+    }
+  }
+  return '<div class="card">' + head + st + '<div class="note">' + note + '</div><div class="actions">' + act + '</div></div>';
+}
+function btn(text, onclick, primary) {
+  return '<button class="btn ' + (primary ? 'btn-primary' : '') + '" onclick="' + onclick + '">' + text + '</button>';
+}
+
+function boardHtml(key, day, uid) {
+  if (!day || !day.finalized) {
+    return '<div class="empty">' + P.label(key) + ' 배정은 전날 오후 3시에 확정됩니다.</div>';
+  }
+  var seats = day.seats || {};
+  var out = '';
+  ['annex', 'nam', 'wait'].forEach(function (lot) {
+    var list = Object.keys(seats).filter(function (u) { return seats[u].lot === lot; })
+      .sort(function (a, b) { return rank(seats[a]) - rank(seats[b]) || (seats[a].order || 99) - (seats[b].order || 99); });
+    var holding = list.filter(function (u) { return /^(ok|in)$/.test(seats[u].status); }).length;
+    out += '<div class="lot-title ' + lot + '"><span>' + LOT_NAME[lot] + '</span><span>' +
+      (lot === 'wait' ? list.length + '명' : holding + ' / ' + P.LOTS[lot].cap) + '</span></div>';
+    if (!list.length) out += '<div class="empty">없음</div>';
+    list.forEach(function (u, i) {
+      var p = _users[u] || {}, s = seats[u];
+      out += '<div class="row' + (u === uid ? ' me' : '') + '"><span class="no">' + (lot === 'wait' ? s.order : i + 1) + '</span>' +
+        '<span class="nm">' + esc(p.name || '(삭제됨)') + '</span><span class="pl">' + esc(p.plate || '') + '</span>' + statusBadge(s) + '</div>';
+    });
+  });
+  return out;
+}
+function rank(s) { return { 'in': 0, ok: 1, wait: 1, released: 2, returned: 3 }[s.status]; }
+function statusBadge(s) {
+  if (s.status === 'in') return '<span class="badge in">주차 완료</span>';
+  if (s.status === 'returned') return '<span class="badge off">반납</span>';
+  if (s.status === 'released') return '<span class="badge off">해제</span>';
+  if (s.status === 'ok') return '<span class="badge">' + (s.promotedAt ? '승계' : '배정') + '</span>';
+  return '';
+}
+function setBoard(key) { _boardKey = key; render(); }
+
+// ── 동작 ────────────────────────────────────
+function toggleReq(key, on) {
+  if (P.now() >= P.deadline(key)) { showToast('신청이 마감되었습니다'); return; }
+  var r = _db.ref(P.ROOT + '/requests/' + key + '/' + _user.uid);
+  (on ? r.set(firebase.database.ServerValue.TIMESTAMP) : r.remove())
+    .then(function () { showToast(on ? P.label(key) + ' 신청했습니다' : '신청을 취소했습니다'); })
+    .catch(function () { showToast('처리하지 못했습니다. 마감되었을 수 있습니다'); });
+}
+function doCheckIn(key) {
+  P.checkIn(_db, key, _user.uid).then(function () { showToast('주차 완료로 표시했습니다'); }, fail);
+}
+function doReturn(key, q) {
+  if (!confirm(q)) return;
+  P.returnSeat(_db, key, _user.uid, _users).then(function () { showToast('처리했습니다'); }, fail);
+}
+function doLate(key) {
+  P.lateJoin(_db, key, _user.uid, _users).then(function () { showToast('대기 등록했습니다'); }, fail);
+}
+function fail() { showToast('처리하지 못했습니다. 잠시 후 다시 시도하세요'); }
+
+function esc(s) {
+  return String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function () { t.classList.remove('show'); }, 2500);
+}
+</script>
+</body>
+</html>

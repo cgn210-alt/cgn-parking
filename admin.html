@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CGN 주차 관리자</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:#f5f4f1; --surface:#ffffff; --surface-sub:#f9f8f6;
+      --border:#e4e2dc; --text-primary:#1a1916; --text-secondary:#5c5a55; --text-muted:#9c9990;
+      --accent:#d9480f; --accent-bg:#fff1e8; --radius:10px;
+      --annex:#1a4f9c; --nam:#1e7a46; --nam-bg:#e9f6ee; --wait:#8a6d00;
+      --danger:#9c1a1a; --font:'Noto Sans KR',sans-serif;
+    }
+    body { font-family:var(--font); background:var(--bg); color:var(--text-primary); min-height:100vh; -webkit-font-smoothing:antialiased; }
+    .wrap { max-width:760px; margin:0 auto; padding-bottom:40px; }
+    .center { display:flex; align-items:center; justify-content:center; min-height:100vh; padding:24px 16px; }
+    .card-box { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:28px 24px; width:100%; max-width:340px; text-align:center; }
+    .box-title { font-size:18px; font-weight:700; margin-bottom:6px; }
+    .box-sub { font-size:12.5px; color:var(--text-muted); margin-bottom:20px; line-height:1.6; }
+    .input { width:100%; font-family:var(--font); font-size:14px; background:var(--surface-sub); border:1px solid var(--border); border-radius:8px; padding:9px 12px; outline:none; }
+    .input:focus { border-color:var(--accent); }
+    .card-box .input { margin-bottom:8px; font-size:15px; padding:11px 14px; }
+    .btn { font-family:var(--font); font-size:13px; font-weight:500; border-radius:8px; padding:7px 12px; cursor:pointer; border:1px solid var(--border); background:var(--surface-sub); color:var(--text-primary); white-space:nowrap; }
+    .btn-primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+    .btn-block { width:100%; padding:11px; font-size:14px; }
+    .btn-on { background:var(--accent-bg); border-color:var(--accent); color:var(--accent); font-weight:700; }
+    .btn-danger { color:var(--danger); }
+    .msg { font-size:12.5px; color:var(--danger); margin-top:10px; }
+    .header { background:var(--surface); border-bottom:1px solid var(--border); padding:14px 16px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:10; }
+    .header-title { font-size:15px; font-weight:700; }
+    .header-sub { font-size:11.5px; color:var(--text-muted); margin-top:2px; }
+    .tabs { display:flex; gap:6px; padding:12px 16px 0; }
+    .tabs .btn { flex:1; }
+    .section { padding:12px 16px 0; }
+    .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px; margin-bottom:10px; }
+    .summary { font-size:13px; color:var(--text-secondary); line-height:1.7; }
+    .summary b { color:var(--text-primary); }
+    .toolbar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:10px; }
+    .toolbar .input { width:auto; flex:1; min-width:140px; }
+    .user { display:grid; grid-template-columns:1fr auto; gap:6px 10px; padding:10px 0; border-top:1px solid var(--border); align-items:center; }
+    .user:first-child { border-top:none; }
+    .user.pending { background:var(--accent-bg); margin:0 -14px; padding:10px 14px; }
+    .u-name { font-size:14px; font-weight:500; }
+    .u-sub { font-size:12px; color:var(--text-muted); margin-top:2px; word-break:break-all; }
+    .u-ctrl { display:flex; gap:6px; align-items:center; flex-wrap:wrap; justify-content:flex-end; }
+    .u-ctrl select { font-family:var(--font); font-size:13px; padding:6px 8px; border:1px solid var(--border); border-radius:8px; background:var(--surface-sub); }
+    .chk { font-size:12.5px; display:flex; align-items:center; gap:4px; color:var(--text-secondary); }
+    .lot-title { font-size:13px; font-weight:700; margin:14px 0 6px; display:flex; justify-content:space-between; }
+    .lot-title:first-child { margin-top:0; }
+    .lot-title.annex { color:var(--annex); } .lot-title.nam { color:var(--nam); } .lot-title.wait { color:var(--wait); }
+    .row { display:flex; align-items:center; gap:8px; font-size:13px; padding:6px 0; border-top:1px solid var(--surface-sub); flex-wrap:wrap; }
+    .row .no { width:22px; color:var(--text-muted); font-size:12px; }
+    .row .nm { flex:1; min-width:90px; }
+    .row .pl { color:var(--text-secondary); font-size:12.5px; }
+    .badge { font-size:11px; padding:2px 7px; border-radius:10px; background:var(--surface-sub); color:var(--text-muted); }
+    .badge.in { background:var(--nam-bg); color:var(--nam); }
+    .badge.off { text-decoration:line-through; }
+    .row .btn { font-size:11.5px; padding:4px 8px; }
+    .empty { font-size:12.5px; color:var(--text-muted); padding:6px 0; }
+    table { width:100%; border-collapse:collapse; font-size:13px; }
+    th, td { text-align:left; padding:7px 6px; border-top:1px solid var(--border); }
+    th { font-size:12px; color:var(--text-muted); font-weight:500; border-top:none; }
+    td.num { text-align:right; font-variant-numeric:tabular-nums; }
+    .toast { position:fixed; top:70px; left:50%; transform:translateX(-50%) translateY(-10px); background:#1a1916; color:#fff; font-size:13px; padding:10px 20px; border-radius:20px; opacity:0; transition:opacity 0.2s, transform 0.2s; z-index:100; pointer-events:none; }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+    .hidden { display:none !important; }
+  </style>
+</head>
+<body>
+
+<div class="center hidden" id="setupScreen">
+  <div class="card-box">
+    <div class="box-title">설정이 필요합니다</div>
+    <div class="box-sub">firebase-config.js 에 Firebase 설정값을 입력해야 합니다. README.md 를 참고하세요.</div>
+  </div>
+</div>
+
+<div class="center hidden" id="loginScreen">
+  <div class="card-box">
+    <div class="box-title">CGN 주차 관리자</div>
+    <div class="box-sub">직원 화면에서 가입한 회사 이메일로 로그인하세요</div>
+    <input class="input" type="email" id="email" placeholder="회사 이메일" />
+    <input class="input" type="password" id="pw" placeholder="비밀번호" onkeydown="if(event.key==='Enter')doLogin()" />
+    <button class="btn btn-primary btn-block" onclick="doLogin()">로그인</button>
+    <div class="msg" id="loginMsg"></div>
+    <div class="box-sub" style="margin:14px 0 0;"><a style="cursor:pointer;text-decoration:underline;" onclick="resetPw()">비밀번호 찾기</a></div>
+  </div>
+</div>
+
+<div class="center hidden" id="denyScreen">
+  <div class="card-box">
+    <div class="box-title">관리자 권한이 없습니다</div>
+    <div class="box-sub" id="denyMsg">마스터 관리자에게 권한을 요청하세요.</div>
+    <button class="btn btn-block" onclick="firebase.auth().signOut()">로그아웃</button>
+  </div>
+</div>
+
+<div class="wrap hidden" id="adminScreen">
+  <div class="header">
+    <div>
+      <div class="header-title">CGN 주차 관리자</div>
+      <div class="header-sub" id="roleLine"></div>
+    </div>
+    <button class="btn" onclick="firebase.auth().signOut()">로그아웃</button>
+  </div>
+  <div class="tabs">
+    <button class="btn" id="tab-users" onclick="setTab('users')">직원</button>
+    <button class="btn" id="tab-day" onclick="setTab('day')">일자별 현황</button>
+    <button class="btn" id="tab-stats" onclick="setTab('stats')">월별 통계</button>
+    <button class="btn" id="tab-admins" onclick="setTab('admins')">관리자</button>
+  </div>
+
+  <div class="section hidden" id="pane-admins">
+    <div class="card summary">관리자는 직원 화면에서 가입한 사람 중에서 지정합니다. 관리자 지정과 해제는 마스터만 할 수 있습니다.</div>
+    <div class="card">
+      <div class="lot-title"><span>새 관리자 지정</span></div>
+      <div class="toolbar"><select class="input" id="newAdmin"></select></div>
+      <div class="toolbar" id="newPerms"></div>
+      <button class="btn btn-primary" onclick="addAdmin()">관리자로 지정</button>
+    </div>
+    <div class="card" id="adminList"></div>
+  </div>
+
+  <div class="section" id="pane-users">
+    <div class="card summary" id="userSummary"></div>
+    <div class="card">
+      <div class="toolbar"><input class="input" id="userSearch" placeholder="이름, 차량번호, 이메일 검색" oninput="renderUsers()" /></div>
+      <div id="userList"></div>
+    </div>
+  </div>
+
+  <div class="section hidden" id="pane-day">
+    <div class="card">
+      <div class="toolbar">
+        <input class="input" type="date" id="dayPick" onchange="watchDay()" />
+        <button class="btn" onclick="shiftDay(-1)">이전</button>
+        <button class="btn" onclick="shiftDay(1)">다음</button>
+      </div>
+      <div class="summary" id="dayInfo"></div>
+    </div>
+    <div class="card" id="dayBoard"></div>
+  </div>
+
+  <div class="section hidden" id="pane-stats">
+    <div class="card">
+      <div class="toolbar"><input class="input" type="month" id="monthPick" onchange="loadStats()" /></div>
+      <div id="stats"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="firebase-config.js"></script>
+<script src="parking-core.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+var P = Parking;
+var _db = null, _users = {}, _usersRef = null, _dayRef = null, _reqRef = null;
+var _day = null, _reqCount = 0, _tab = null;
+var _me = null, _perms = {}, _master = false, _myAdminRef = null, _adminsRef = null, _admins = {};
+var LOT_NAME = { annex: '별관', nam: '남경', wait: '대기' };
+// 마스터가 관리자에게 골라서 줄 수 있는 권한
+var PERMS = [
+  { key: 'users',    name: '직원 승인·수정',   desc: '가입 승인, 그룹·이름·차량번호 수정, 삭제' },
+  { key: 'priority', name: '우선 배정 지정',   desc: '우선 배정 대상 지정과 해제' },
+  { key: 'day',      name: '일자별 현황 처리', desc: '주차 완료·해제·반납 처리, 배정 확정·9시 해제 실행' },
+  { key: 'stats',    name: '월별 통계',        desc: '직원별 월 이용 횟수 조회' }
+];
+
+window.addEventListener('load', function () {
+  if (typeof FIREBASE_CONFIG === 'undefined' || !FIREBASE_CONFIG.apiKey) { show('setupScreen'); return; }
+  firebase.initializeApp(FIREBASE_CONFIG);
+  _db = firebase.database();
+  _db.ref('.info/serverTimeOffset').on('value', function (s) { P.setOffset(s.val()); });
+  firebase.auth().onAuthStateChanged(function (u) {
+    stop();
+    _me = u;
+    if (!u) { document.getElementById('pw').value = ''; show('loginScreen'); return; }
+    if (u.email === MASTER_EMAIL) {
+      if (!u.emailVerified) { deny('마스터 계정의 메일 인증이 아직 안 되었습니다. 직원 화면에서 가입할 때 받은 인증 메일의 링크를 눌러주세요.'); return; }
+      _master = true;
+      _perms = {}; PERMS.forEach(function (p) { _perms[p.key] = true; });
+      enter();
+      return;
+    }
+    // 마스터가 지정한 관리자인지 확인 (권한이 바뀌면 화면에 바로 반영)
+    _myAdminRef = _db.ref(P.ROOT + '/admins/' + u.uid);
+    _myAdminRef.on('value', function (s) {
+      var a = s.val();
+      if (!a) { stop(); deny('마스터 관리자(' + MASTER_NAME + ')에게 권한을 요청하세요.'); return; }
+      _perms = a.perms || {};
+      enter();
+    }, function () { deny('마스터 관리자(' + MASTER_NAME + ')에게 권한을 요청하세요.'); });
+  });
+});
+
+function show(id) {
+  ['setupScreen', 'loginScreen', 'denyScreen', 'adminScreen'].forEach(function (s) {
+    document.getElementById(s).classList.toggle('hidden', s !== id);
+  });
+}
+function deny(msg) { document.getElementById('denyMsg').textContent = msg; show('denyScreen'); }
+function can(k) { return _master || !!_perms[k]; }
+
+function doLogin() {
+  var email = document.getElementById('email').value.trim().toLowerCase(), pw = document.getElementById('pw').value;
+  var msg = document.getElementById('loginMsg');
+  msg.textContent = '';
+  firebase.auth().signInWithEmailAndPassword(email, pw).catch(function () {
+    msg.textContent = '이메일 또는 비밀번호가 올바르지 않습니다';
+    document.getElementById('pw').value = '';
+  });
+}
+function resetPw() {
+  var email = document.getElementById('email').value.trim(), msg = document.getElementById('loginMsg');
+  if (!email) { msg.textContent = '이메일을 입력한 뒤 다시 눌러주세요'; return; }
+  firebase.auth().sendPasswordResetEmail(email)
+    .then(function () { msg.textContent = '비밀번호 재설정 메일을 보냈습니다'; })
+    .catch(function () { msg.textContent = '메일을 보내지 못했습니다'; });
+}
+
+function enter() {
+  show('adminScreen');
+  var names = PERMS.filter(function (p) { return can(p.key); }).map(function (p) { return p.name; });
+  document.getElementById('roleLine').textContent = _master ? '마스터 관리자 · 모든 권한'
+    : '관리자 · ' + (names.length ? names.join(', ') : '조회만 가능');
+  var vis = { users: can('users') || can('priority'), day: true, stats: can('stats'), admins: _master };
+  Object.keys(vis).forEach(function (k) { document.getElementById('tab-' + k).classList.toggle('hidden', !vis[k]); });
+  if (!_tab || !vis[_tab]) _tab = ['users', 'day', 'stats', 'admins'].filter(function (k) { return vis[k]; })[0];
+  if (!_usersRef) {
+    _usersRef = _db.ref(P.ROOT + '/users');
+    _usersRef.on('value', function (s) { _users = s.val() || {}; renderUsers(); renderDay(); renderAdmins(); });
+    document.getElementById('dayPick').value = P.today();
+    document.getElementById('monthPick').value = P.today().slice(0, 7);
+    watchDay();
+  }
+  if (_master && !_adminsRef) {
+    _adminsRef = _db.ref(P.ROOT + '/admins');
+    _adminsRef.on('value', function (s) { _admins = s.val() || {}; renderAdmins(); });
+  }
+  setTab(_tab);
+  renderUsers(); renderDay();
+}
+function stop() {
+  if (_usersRef) { _usersRef.off(); _usersRef = null; }
+  if (_dayRef) { _dayRef.off(); _dayRef = null; }
+  if (_reqRef) { _reqRef.off(); _reqRef = null; }
+  if (_myAdminRef) { _myAdminRef.off(); _myAdminRef = null; }
+  if (_adminsRef) { _adminsRef.off(); _adminsRef = null; }
+  _master = false; _perms = {}; _admins = {};
+}
+function setTab(t) {
+  _tab = t;
+  ['users', 'day', 'stats', 'admins'].forEach(function (k) {
+    document.getElementById('pane-' + k).classList.toggle('hidden', k !== t);
+    document.getElementById('tab-' + k).classList.toggle('btn-on', k === t);
+  });
+  if (t === 'stats') loadStats();
+}
+
+// ── 관리자 지정 (마스터 전용) ──────────────────
+function permBoxes(prefix, cur) {
+  return PERMS.map(function (p) {
+    return '<label class="chk" title="' + p.desc + '"><input type="checkbox" id="' + prefix + p.key + '"' +
+      (cur && cur[p.key] ? ' checked' : '') + ' />' + p.name + '</label>';
+  }).join('');
+}
+function renderAdmins() {
+  if (!_master) return;
+  var sel = document.getElementById('newAdmin');
+  var keep = sel.value;
+  var cands = Object.keys(_users).filter(function (u) { return !_admins[u] && _users[u].email !== MASTER_EMAIL; })
+    .sort(function (a, b) { return String(_users[a].name).localeCompare(String(_users[b].name), 'ko'); });
+  sel.innerHTML = '<option value="">직원 선택</option>' + cands.map(function (u) {
+    return '<option value="' + u + '">' + esc(_users[u].name) + ' (' + esc(_users[u].email) + ')</option>';
+  }).join('');
+  sel.value = cands.indexOf(keep) >= 0 ? keep : '';
+  if (!document.getElementById('newPerms').innerHTML) document.getElementById('newPerms').innerHTML = permBoxes('np-', null);
+
+  var ids = Object.keys(_admins);
+  document.getElementById('adminList').innerHTML =
+    '<div class="lot-title"><span>지정된 관리자</span><span>' + ids.length + '명</span></div>' +
+    '<div class="user"><div><div class="u-name">' + esc(MASTER_NAME) + ' · 마스터</div><div class="u-sub">' + esc(MASTER_EMAIL) + '</div></div><div class="u-ctrl"><span class="badge">모든 권한</span></div></div>' +
+    ids.map(function (u) {
+      var a = _admins[u], p = _users[u] || {};
+      return '<div class="user"><div><div class="u-name">' + esc(p.name || a.name) + '</div><div class="u-sub">' + esc(p.email || a.email) + '</div></div>' +
+        '<div class="u-ctrl">' + PERMS.map(function (pm) {
+          return '<label class="chk" title="' + pm.desc + '"><input type="checkbox"' + (a.perms && a.perms[pm.key] ? ' checked' : '') +
+            ' onchange="setPerm(\'' + u + '\',\'' + pm.key + '\',this.checked)" />' + pm.name + '</label>';
+        }).join('') +
+        '<button class="btn btn-danger" onclick="removeAdmin(\'' + u + '\')">해제</button></div></div>';
+    }).join('');
+}
+function addAdmin() {
+  var uid = document.getElementById('newAdmin').value;
+  if (!uid) { showToast('관리자로 지정할 직원을 고르세요'); return; }
+  var perms = {}, any = false;
+  PERMS.forEach(function (p) { if (document.getElementById('np-' + p.key).checked) { perms[p.key] = true; any = true; } });
+  if (!any) { showToast('줄 권한을 하나 이상 고르세요'); return; }
+  var p = _users[uid];
+  _db.ref(P.ROOT + '/admins/' + uid).set({ name: p.name, email: p.email, perms: perms, at: firebase.database.ServerValue.TIMESTAMP })
+    .then(function () {
+      PERMS.forEach(function (pm) { document.getElementById('np-' + pm.key).checked = false; });
+      showToast(p.name + ' 님을 관리자로 지정했습니다');
+    }, function (e) { showToast('지정 실패: ' + e.message); });
+}
+function setPerm(uid, key, on) {
+  _db.ref(P.ROOT + '/admins/' + uid + '/perms/' + key).set(on ? true : null)
+    .then(function () { showToast('권한을 바꿨습니다'); }, function (e) { showToast('실패: ' + e.message); });
+}
+function removeAdmin(uid) {
+  if (!confirm((_admins[uid].name || '') + ' 님의 관리자 지정을 해제할까요?')) return;
+  _db.ref(P.ROOT + '/admins/' + uid).remove().then(function () { showToast('해제했습니다'); });
+}
+
+// ── 직원 ────────────────────────────────────
+function renderUsers() {
+  var ids = Object.keys(_users);
+  var ok = ids.filter(function (u) { return _users[u].approved; });
+  var cnt = function (g) { return ok.filter(function (u) { return _users[u].group === g; }).length; };
+  var pend = ids.length - ok.length;
+  document.getElementById('userSummary').innerHTML =
+    '승인 <b>' + ok.length + '명</b> (홀수 ' + cnt('odd') + ' · 짝수 ' + cnt('even') + ') · 우선 배정 ' +
+    ok.filter(function (u) { return _users[u].priority; }).length + '명' +
+    (pend ? ' · <b style="color:var(--accent)">승인 대기 ' + pend + '명</b>' : '');
+
+  var q = document.getElementById('userSearch').value.trim().toLowerCase();
+  ids = ids.filter(function (u) {
+    var p = _users[u];
+    return !q || [p.name, p.plate, p.email].join(' ').toLowerCase().indexOf(q) >= 0;
+  }).sort(function (a, b) {
+    return (_users[a].approved ? 1 : 0) - (_users[b].approved ? 1 : 0) ||
+      String(_users[a].name).localeCompare(String(_users[b].name), 'ko');
+  });
+  var html = '', cu = can('users'), cp = can('priority');
+  ids.forEach(function (u) {
+    var p = _users[u];
+    html += '<div class="user' + (p.approved ? '' : ' pending') + '">' +
+      '<div><div class="u-name">' + esc(p.name) + ' · ' + esc(p.plate) + '</div><div class="u-sub">' + esc(p.email) + '</div></div>' +
+      '<div class="u-ctrl">' +
+        (cu ? '<select onchange="setUser(\'' + u + '\',\'group\',this.value)">' +
+          '<option value="odd"' + (p.group === 'odd' ? ' selected' : '') + '>홀수날</option>' +
+          '<option value="even"' + (p.group === 'even' ? ' selected' : '') + '>짝수날</option>' +
+        '</select>' : '<span class="badge">' + P.groupName(p.group) + '날</span>') +
+        (cp ? '<label class="chk"><input type="checkbox"' + (p.priority ? ' checked' : '') + ' onchange="setUser(\'' + u + '\',\'priority\',this.checked)" />우선</label>'
+          : (p.priority ? '<span class="badge">우선</span>' : '')) +
+        (cu ? (p.approved
+          ? '<button class="btn" onclick="setUser(\'' + u + '\',\'approved\',false)">승인 취소</button>'
+          : '<button class="btn btn-primary" onclick="setUser(\'' + u + '\',\'approved\',true)">승인</button>') +
+          '<button class="btn" onclick="editUser(\'' + u + '\')">수정</button>' +
+          '<button class="btn btn-danger" onclick="deleteUser(\'' + u + '\')">삭제</button>'
+          : (p.approved ? '' : '<span class="badge">승인 대기</span>')) +
+      '</div></div>';
+  });
+  document.getElementById('userList').innerHTML = html || '<div class="empty">등록된 직원이 없습니다</div>';
+}
+function setUser(uid, field, val) {
+  var upd = {};
+  upd[field] = (field === 'priority' && !val) ? null : val;
+  _db.ref(P.ROOT + '/users/' + uid).update(upd)
+    .then(function () { showToast('저장했습니다'); }, function (e) { showToast('저장 실패: ' + e.message); });
+}
+function editUser(uid) {
+  var p = _users[uid];
+  var name = prompt('이름', p.name); if (name === null) return;
+  var plate = prompt('차량번호', p.plate); if (plate === null) return;
+  _db.ref(P.ROOT + '/users/' + uid).update({ name: name.trim() || p.name, plate: plate.trim() || p.plate })
+    .then(function () { showToast('저장했습니다'); });
+}
+function deleteUser(uid) {
+  if (!confirm(_users[uid].name + ' 님의 등록을 삭제할까요? 지난 기록에는 이름이 "삭제됨"으로 표시됩니다.')) return;
+  _db.ref(P.ROOT + '/users/' + uid).remove().then(function () { showToast('삭제했습니다'); });
+}
+
+// ── 일자별 현황 ─────────────────────────────
+function shiftDay(n) {
+  var el = document.getElementById('dayPick');
+  el.value = P.addDays(el.value || P.today(), n);
+  watchDay();
+}
+function watchDay() {
+  var key = document.getElementById('dayPick').value || P.today();
+  if (_dayRef) _dayRef.off();
+  if (_reqRef) _reqRef.off();
+  _day = null; _reqCount = 0;
+  _dayRef = _db.ref(P.ROOT + '/days/' + key);
+  _dayRef.on('value', function (s) { _day = s.val(); renderDay(); });
+  _reqRef = _db.ref(P.ROOT + '/requests/' + key);
+  _reqRef.on('value', function (s) { _reqCount = Object.keys(s.val() || {}).length; renderDay(); });
+}
+function renderDay() {
+  var key = document.getElementById('dayPick').value;
+  if (!key) return;
+  var info = '<b>' + P.label(key) + '</b> · ' + P.groupName(P.dayGroup(key)) + '날 · 신청 ' + _reqCount + '명';
+  var board = '';
+  if (!_day || !_day.finalized) {
+    var due = P.now() >= P.deadline(key);
+    info += '<br>' + (due ? '마감이 지났지만 아직 배정이 실행되지 않았습니다. ' +
+      (can('day') ? '<button class="btn btn-primary" onclick="runFinalize()">지금 배정 확정</button>' : '')
+      : '전날 오후 3시에 배정이 확정됩니다.');
+    board = '<div class="empty">배정 전입니다</div>';
+  } else {
+    info += '<br>배정 확정 ' + fmtTime(_day.finalizedAt) + (_day.swept ? ' · 오전 9시 해제 처리됨' : '');
+    if (can('day') && key === P.today() && !_day.swept && P.now() >= P.releaseTime(key)) {
+      info += ' <button class="btn btn-primary" onclick="runSweep()">9시 해제 실행</button>';
+    }
+    board = boardHtml(key, _day);
+  }
+  document.getElementById('dayInfo').innerHTML = info;
+  document.getElementById('dayBoard').innerHTML = board;
+}
+function boardHtml(key, day) {
+  var seats = day.seats || {};
+  var out = '';
+  ['annex', 'nam', 'wait'].forEach(function (lot) {
+    var list = Object.keys(seats).filter(function (u) { return seats[u].lot === lot; })
+      .sort(function (a, b) { return rank(seats[a]) - rank(seats[b]) || (seats[a].order || 99) - (seats[b].order || 99); });
+    var holding = list.filter(function (u) { return /^(ok|in)$/.test(seats[u].status); }).length;
+    out += '<div class="lot-title ' + lot + '"><span>' + LOT_NAME[lot] + '</span><span>' +
+      (lot === 'wait' ? list.length + '명' : holding + ' / ' + P.LOTS[lot].cap) + '</span></div>';
+    if (!list.length) out += '<div class="empty">없음</div>';
+    list.forEach(function (u, i) {
+      var p = _users[u] || {}, s = seats[u];
+      var acts = '';
+      if (can('day')) {
+        if (s.status === 'ok') acts += act('주차 완료', 'adminCheckIn', u) + act('해제', 'adminRelease', u);
+        if (s.status === 'in') acts += act('반납 처리', 'adminReturn', u);
+        if (s.status === 'wait') acts += act('대기 취소', 'adminReturn', u);
+      }
+      out += '<div class="row"><span class="no">' + (lot === 'wait' ? s.order : i + 1) + '</span>' +
+        '<span class="nm">' + esc(p.name || '(삭제됨)') + ' <span class="pl">' + esc(p.plate || '') + '</span></span>' +
+        statusBadge(s) + acts + '</div>';
+    });
+  });
+  return out;
+}
+function act(text, fn, uid) { return '<button class="btn" onclick="' + fn + '(\'' + uid + '\')">' + text + '</button>'; }
+function rank(s) { return { 'in': 0, ok: 1, wait: 1, released: 2, returned: 3 }[s.status]; }
+function statusBadge(s) {
+  if (s.status === 'in') return '<span class="badge in">주차 완료' + (s.inAt ? ' ' + fmtTime(s.inAt, true) : '') + '</span>';
+  if (s.status === 'returned') return '<span class="badge off">반납</span>';
+  if (s.status === 'released') return '<span class="badge off">해제</span>';
+  if (s.status === 'ok') return '<span class="badge">' + (s.promotedAt ? '승계' : '배정') + '</span>';
+  return s.lateAt ? '<span class="badge">늦은 등록</span>' : '';
+}
+function dayKey() { return document.getElementById('dayPick').value; }
+function done(p) { p.then(function () { showToast('처리했습니다'); }, function (e) { showToast('실패: ' + e.message); }); }
+function adminCheckIn(u) { done(P.checkIn(_db, dayKey(), u)); }
+function adminRelease(u) { if (confirm('이 배정을 해제하고 대기자에게 넘길까요?')) done(P.release(_db, dayKey(), u, _users)); }
+function adminReturn(u) { if (confirm('반납(대기 취소) 처리할까요?')) done(P.returnSeat(_db, dayKey(), u, _users)); }
+function runFinalize() { done(P.ensureFinalized(_db, dayKey(), _users)); }
+function runSweep() { done(P.ensureSwept(_db, dayKey(), _users)); }
+
+// ── 월별 통계 ───────────────────────────────
+function loadStats() {
+  var ym = document.getElementById('monthPick').value;
+  if (!ym) return;
+  var last = P.addDays(P.addDays(ym + '-28', 4).slice(0, 8) + '01', -1);
+  P.readMonth(_db, last).then(function (days) {
+    var c = P.monthCounts(days, last, true);
+    var ids = Object.keys(_users).filter(function (u) { return _users[u].approved || c[u]; });
+    ids.sort(function (a, b) { return (c[b] || 0) - (c[a] || 0) || String((_users[a] || {}).name).localeCompare(String((_users[b] || {}).name), 'ko'); });
+    var nDays = Object.keys(days).filter(function (k) { return days[k].finalized; }).length;
+    var rows = ids.map(function (u) {
+      var p = _users[u] || {};
+      return '<tr><td>' + esc(p.name || '(삭제됨)') + '</td><td>' + P.groupName(p.group) + (p.priority ? ' · 우선' : '') + '</td><td class="num">' + (c[u] || 0) + '회</td></tr>';
+    }).join('');
+    document.getElementById('stats').innerHTML =
+      '<div class="summary" style="margin-bottom:8px;">배정이 확정된 날 ' + nDays + '일 · 이용 횟수는 반납을 빼고 미도착 해제는 포함합니다</div>' +
+      '<table><thead><tr><th>이름</th><th>그룹</th><th style="text-align:right">이용</th></tr></thead><tbody>' +
+      (rows || '<tr><td colspan="3" class="empty">기록이 없습니다</td></tr>') + '</tbody></table>';
+  });
+}
+
+function fmtTime(ms, short) {
+  if (!ms) return '';
+  var d = new Date(ms + 9 * 3600000);
+  var hm = d.getUTCHours() + ':' + ('0' + d.getUTCMinutes()).slice(-2);
+  return short ? hm : (d.getUTCMonth() + 1) + '/' + d.getUTCDate() + ' ' + hm;
+}
+function esc(s) {
+  return String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function () { t.classList.remove('show'); }, 2500);
+}
+</script>
+</body>
+</html>

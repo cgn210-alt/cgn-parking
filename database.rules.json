@@ -1,0 +1,41 @@
+{
+  "rules": {
+    "parking": {
+      "admins": {
+        ".read": "auth != null && auth.token.email === 'cgn210@cgnmail.net' && auth.token.email_verified === true",
+        "$uid": {
+          ".read": "auth != null && auth.uid === $uid",
+          ".write": "auth != null && auth.token.email === 'cgn210@cgnmail.net' && auth.token.email_verified === true"
+        }
+      },
+      "users": {
+        ".read": "auth != null && ((auth.token.email === 'cgn210@cgnmail.net' && auth.token.email_verified === true) || root.child('parking/admins').child(auth.uid).exists() || root.child('parking/users').child(auth.uid).child('approved').val() === true)",
+        "$uid": {
+          ".read": "auth != null && auth.uid === $uid",
+          ".write": "auth != null && ((auth.token.email === 'cgn210@cgnmail.net' && auth.token.email_verified === true) || (root.child('parking/admins').child(auth.uid).child('perms/users').val() === true && !newData.exists()) || (auth.uid === $uid && !data.exists() && newData.child('approved').val() === false && !newData.child('priority').exists() && auth.token.email_verified === true && auth.token.email.endsWith('@cgnmail.net')))",
+          "priority": {
+            ".write": "auth != null && root.child('parking/admins').child(auth.uid).child('perms/priority').val() === true"
+          },
+          "$field": {
+            ".write": "auth != null && root.child('parking/admins').child(auth.uid).child('perms/users').val() === true"
+          }
+        }
+      },
+      "requests": {
+        ".read": "auth != null && ((auth.token.email === 'cgn210@cgnmail.net' && auth.token.email_verified === true) || root.child('parking/admins').child(auth.uid).exists() || root.child('parking/users').child(auth.uid).child('approved').val() === true)",
+        "$date": {
+          "$uid": {
+            ".write": "auth != null && ((auth.token.email === 'cgn210@cgnmail.net' && auth.token.email_verified === true) || root.child('parking/admins').child(auth.uid).child('perms/day').val() === true || (auth.uid === $uid && root.child('parking/users').child(auth.uid).child('approved').val() === true && !root.child('parking/days').child($date).child('finalized').exists()))",
+            ".validate": "newData.isNumber()"
+          }
+        }
+      },
+      "days": {
+        ".read": "auth != null && ((auth.token.email === 'cgn210@cgnmail.net' && auth.token.email_verified === true) || root.child('parking/admins').child(auth.uid).exists() || root.child('parking/users').child(auth.uid).child('approved').val() === true)",
+        "$date": {
+          ".write": "auth != null && ((auth.token.email === 'cgn210@cgnmail.net' && auth.token.email_verified === true) || root.child('parking/admins').child(auth.uid).child('perms/day').val() === true || root.child('parking/users').child(auth.uid).child('approved').val() === true)"
+        }
+      }
+    }
+  }
+}
