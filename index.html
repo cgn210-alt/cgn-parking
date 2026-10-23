@@ -375,7 +375,7 @@ function render() {
   document.getElementById('myCount').textContent = P.monthCounts(_days, t, true)[uid] || 0;
 
   // 현황판
-  if (!_boardKey || (_boardKey !== t && _boardKey !== P.addDays(t, 1))) _boardKey = t;
+  if (!_boardKey || (_boardKey !== t && _boardKey !== P.addDays(t, 1))) _boardKey = location.hash === '#tomorrow' ? P.addDays(t, 1) : t;
   var tabs = '';
   [t, P.addDays(t, 1)].forEach(function (key, i) {
     tabs += '<button class="btn ' + (key === _boardKey ? 'btn-on' : '') + '" onclick="setBoard(\'' + key + '\')">' + (i ? '내일 ' : '오늘 ') + P.label(key) + '</button>';
@@ -452,7 +452,17 @@ function statusBadge(s) {
   if (s.status === 'ok') return '<span class="badge">' + (s.promotedAt ? '승계' : '배정') + '</span>';
   return '';
 }
-function setBoard(key) { _boardKey = key; render(); }
+// 현황판 오늘/내일 탭을 주소(#)에 남겨서 휴대폰 뒤로 가기로 앞 탭에 돌아가게 함
+function setBoard(key) {
+  _boardKey = key;
+  var h = key === P.today() ? '#today' : '#tomorrow';
+  if (location.hash !== h) history.pushState(null, '', h);
+  render();
+}
+window.addEventListener('popstate', function () {
+  _boardKey = location.hash === '#tomorrow' ? P.addDays(P.today(), 1) : P.today();
+  render();
+});
 
 // ── 동작 ────────────────────────────────────
 function toggleReq(key, on) {

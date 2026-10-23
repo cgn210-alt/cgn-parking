@@ -143,7 +143,7 @@
   <div class="section hidden" id="pane-day">
     <div class="card">
       <div class="toolbar">
-        <input class="input" type="date" id="dayPick" onchange="watchDay()" />
+        <input class="input" type="date" id="dayPick" onchange="watchDay(); pushNav()" />
         <button class="btn" onclick="shiftDay(-1)">이전</button>
         <button class="btn" onclick="shiftDay(1)">다음</button>
       </div>
@@ -240,12 +240,15 @@ function enter() {
   document.getElementById('roleLine').textContent = _master ? '마스터 관리자 · 모든 권한'
     : '관리자 · ' + (names.length ? names.join(', ') : '조회만 가능');
   var vis = { users: can('users') || can('priority'), day: true, stats: can('stats'), admins: _master };
+  _vis = vis;
   Object.keys(vis).forEach(function (k) { document.getElementById('tab-' + k).classList.toggle('hidden', !vis[k]); });
+  var nav = readNav();
+  if (!_tab && nav.tab && vis[nav.tab]) _tab = nav.tab;
   if (!_tab || !vis[_tab]) _tab = ['users', 'day', 'stats', 'admins'].filter(function (k) { return vis[k]; })[0];
   if (!_usersRef) {
     _usersRef = _db.ref(P.ROOT + '/users');
     _usersRef.on('value', function (s) { _users = s.val() || {}; renderUsers(); renderDay(); renderAdmins(); });
-    document.getElementById('dayPick').value = P.today();
+    document.getElementById('dayPick').value = nav.day || P.today();
     document.getElementById('monthPick').value = P.today().slice(0, 7);
     watchDay();
   }
@@ -253,9 +256,30 @@ function enter() {
     _adminsRef = _db.ref(P.ROOT + '/admins');
     _adminsRef.on('value', function (s) { _admins = s.val() || {}; renderAdmins(); });
   }
-  setTab(_tab);
+  setTab(_tab, true);
+  history.replaceState(null, '', navHash());
   renderUsers(); renderDay();
 }
+
+// ── 뒤로 가기: 탭과 날짜를 주소(#)에 남겨서 휴대폰 뒤로 가기로 앞 단계에 돌아가게 함 ──
+var _vis = {};
+function readNav() {
+  var m = location.hash.match(/^#(users|day|stats|admins)(?:\/(\d{4}-\d{2}-\d{2}))?$/);
+  return m ? { tab: m[1], day: m[2] } : {};
+}
+function navHash() {
+  return '#' + _tab + (_tab === 'day' ? '/' + document.getElementById('dayPick').value : '');
+}
+function pushNav() { if (location.hash !== navHash()) history.pushState(null, '', navHash()); }
+window.addEventListener('popstate', function () {
+  if (!_usersRef) return;
+  var nav = readNav();
+  if (nav.day && nav.day !== document.getElementById('dayPick').value) {
+    document.getElementById('dayPick').value = nav.day;
+    watchDay();
+  }
+  if (nav.tab && _vis[nav.tab]) setTab(nav.tab, true);
+});
 function stop() {
   if (_usersRef) { _usersRef.off(); _usersRef = null; }
   if (_dayRef) { _dayRef.off(); _dayRef = null; }
@@ -264,13 +288,14 @@ function stop() {
   if (_adminsRef) { _adminsRef.off(); _adminsRef = null; }
   _master = false; _perms = {}; _admins = {};
 }
-function setTab(t) {
+function setTab(t, fromNav) {
   _tab = t;
   ['users', 'day', 'stats', 'admins'].forEach(function (k) {
     document.getElementById('pane-' + k).classList.toggle('hidden', k !== t);
     document.getElementById('tab-' + k).classList.toggle('btn-on', k === t);
   });
   if (t === 'stats') loadStats();
+  if (!fromNav) pushNav();
 }
 
 // ── 관리자 지정 (마스터 전용) ──────────────────
@@ -392,6 +417,7 @@ function shiftDay(n) {
   var el = document.getElementById('dayPick');
   el.value = P.addDays(el.value || P.today(), n);
   watchDay();
+  pushNav();
 }
 function watchDay() {
   var key = document.getElementById('dayPick').value || P.today();
