@@ -114,6 +114,17 @@ var ParkingUI = (function (P) {
   // ── 좁은 화면에서 넘치는 표는 줄마다 '항목: 값' 카드로 바꿔 위아래로만 스크롤되게 함 ──
   // 각 칸에 머리글(th) 글자를 data-label 로 붙이고, 표가 칸보다 넓으면 stack 클래스를 붙임
   var STACK_CSS =
+    // 1단계: 글자·여백을 줄인 촘촘한 표 (휴대폰에서도 PC처럼 표 모양 유지)
+    // 값은 줄바꿈하지 않음 (억지로 좁혀 이름이 여러 줄로 끊기면 카드가 낫기 때문). 머리글만 줄바꿈 허용
+    'table.grid.compact { font-size:11.5px; white-space:nowrap; }' +
+    'table.grid.compact th { white-space:normal; }' +
+    'table.grid.compact th, table.grid.compact td { padding:5px 3px; }' +
+    'table.grid.compact th { font-size:10.5px; line-height:1.3; }' +
+    'table.grid.compact td.acts { white-space:normal; }' +
+    'table.grid.compact td.acts .btn { display:block; width:100%; margin:2px 0; padding:4px 5px; font-size:11px; }' +
+    'table.grid.compact .badge, table.grid.compact .tag { font-size:10.5px; padding:2px 5px; }' +
+    'table.grid.compact select { font-size:11px; padding:3px 2px; }' +
+    // 2단계: 그래도 넘치면 카드
     'table.grid.stack, table.grid.stack tbody, table.grid.stack tr, table.grid.stack td { display:block; width:100%; }' +
     'table.grid.stack { border:none; white-space:normal; }' +
     'table.grid.stack thead { display:none; }' +
@@ -169,10 +180,16 @@ var ParkingUI = (function (P) {
       mark(tr, 'hasst', hasSt);
     });
   }
+  // 넓은 화면은 그대로 → 넘치면 촘촘한 표 → 그래도 넘치면 카드
   function fit(table) {
     var box = table.parentNode;
+    // 표 자체 넓이는 상자에 맞춰 줄어든 값으로 나올 수 있어, 넘침은 상자와 표 중 큰 쪽으로 판단
+    var over = function () { return Math.max(box.scrollWidth, table.scrollWidth, table.getBoundingClientRect().width) > box.clientWidth + 2; };
     table.classList.remove('stack');
-    if (box && table.scrollWidth > box.clientWidth + 2) table.classList.add('stack');
+    table.classList.remove('compact');
+    if (!box || !box.clientWidth || !over()) return;
+    table.classList.add('compact');
+    if (over()) { table.classList.remove('compact'); table.classList.add('stack'); }
   }
   function fitAll() { [].forEach.call(document.querySelectorAll('table.grid'), function (t) { label(t); fit(t); }); }
 
