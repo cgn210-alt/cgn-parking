@@ -118,7 +118,8 @@ var ParkingUI = (function (P) {
     'table.grid.stack { border:none; white-space:normal; }' +
     'table.grid.stack thead { display:none; }' +
     // 카드 안은 두 칸으로 나눠 높이를 줄이고, 첫 칸(이름·날짜)과 처리 버튼은 한 줄 전체를 씀
-    'table.grid.stack tr { display:grid; grid-template-columns:1fr 1fr; column-gap:16px; border:1px solid var(--border); border-radius:10px; padding:8px 10px; margin-bottom:8px; background:var(--surface); }' +
+    'table.grid.stack td { min-width:0; overflow-wrap:anywhere; }' +   // 긴 이메일도 카드 안에서 줄바꿈
+    'table.grid.stack tr { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); column-gap:16px; border:1px solid var(--border); border-radius:10px; padding:8px 10px; margin-bottom:8px; background:var(--surface); }' +
     'table.grid.stack tr.sec { display:block; border:none; padding:10px 2px 2px; margin:0; background:none; }' +
     'table.grid.stack td:first-child, table.grid.stack td.acts { grid-column:1 / -1; }' +
     'table.grid.stack td:first-child { font-weight:700; font-size:14px; border-bottom:1px solid var(--border); padding-bottom:6px; margin-bottom:2px; }' +
@@ -155,7 +156,7 @@ var ParkingUI = (function (P) {
     st.textContent = STACK_CSS;
     document.head.appendChild(st);
     var pending = false;
-    var run = function () { if (pending) return; pending = true; requestAnimationFrame(function () { pending = false; fitAll(); }); };
+    var run = function () { if (pending) return; pending = true; setTimeout(function () { pending = false; fitAll(); }, 30); };
     // 내용이 바뀌거나 숨겨진 탭이 열릴 때(class 변경) 다시 맞춤. 표 자신의 stack 표시 변경은 무시
     new MutationObserver(function (recs) {
       if (recs.some(function (r) { return r.type === 'childList' || r.target.tagName !== 'TABLE'; })) run();

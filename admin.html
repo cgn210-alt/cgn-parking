@@ -104,6 +104,7 @@
     .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
     .hidden { display:none !important; }
     @media (max-width:600px) {
+      .btn { white-space:normal; max-width:100%; }
       .u-ctrl { width:100%; justify-content:flex-start; gap:5px; }
       .u-ctrl .btn, .u-ctrl select { padding:6px 8px; font-size:12.5px; }
       .tabs .btn { padding:7px 4px; font-size:12.5px; min-width:22%; }
@@ -257,9 +258,9 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="firebase-config.js"></script>
-<script src="parking-core.js"></script>
-<script src="parking-ui.js"></script>
+<script src="firebase-config.js?v=4"></script>
+<script src="parking-core.js?v=4"></script>
+<script src="parking-ui.js?v=4"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
