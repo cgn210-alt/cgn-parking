@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CGN 주차 관리자</title>
+  <!-- 카카오톡 안 브라우저 등이 예전 화면을 기억하지 않도록 -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <meta name="description" content="CGN 주차 관리자 화면 (관리자 전용)" />
   <meta property="og:title" content="CGN 주차 관리자" />
   <meta property="og:description" content="관리자 전용 · 직원 승인, 월별 그룹, 주간 배정, 일자별 현황, 통계, 공지" />
@@ -280,10 +284,12 @@
   <div class="modal">
     <h3>직원 정보 수정</h3>
     <div class="m-sub" id="eEmail"></div>
+    <!-- 한글 입력: 자동 수정·완성 끄고, 한글 조합 중(isComposing)에는 Enter 저장이 끼어들지 않게 함 -->
     <label for="eName">이름</label>
-    <input class="input" id="eName" />
+    <input class="input" id="eName" type="text" lang="ko" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
     <label for="ePlate">차량번호</label>
-    <input class="input" id="ePlate" placeholder="예: 12가 3456" onkeydown="if(event.key==='Enter')saveEdit()" />
+    <input class="input" id="ePlate" type="text" lang="ko" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+      placeholder="예: 12가 3456" onkeydown="if(event.key==='Enter' && !event.isComposing && event.keyCode!==229)saveEdit()" />
     <div id="eGroups" class="hidden">
       <label for="eG0" id="eG0Lab">이번 달 그룹</label>
       <select class="input" id="eG0"><option value="odd">홀수날</option><option value="even">짝수날</option></select>
