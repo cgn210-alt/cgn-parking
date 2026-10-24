@@ -284,6 +284,13 @@
     <input class="input" id="eName" />
     <label for="ePlate">차량번호</label>
     <input class="input" id="ePlate" placeholder="예: 12가 3456" onkeydown="if(event.key==='Enter')saveEdit()" />
+    <div id="eGroups" class="hidden">
+      <label for="eG0" id="eG0Lab">이번 달 그룹</label>
+      <select class="input" id="eG0"><option value="odd">홀수날</option><option value="even">짝수날</option></select>
+      <label for="eG1" id="eG1Lab">다음 달 그룹</label>
+      <select class="input" id="eG1"><option value="odd">홀수날</option><option value="even">짝수날</option></select>
+      <div class="m-sub" id="eReq" style="margin:8px 0 0;"></div>
+    </div>
     <div class="m-acts">
       <button class="btn" onclick="closeEdit()">취소</button>
       <button class="btn btn-primary" onclick="saveEdit()">저장</button>
@@ -524,13 +531,29 @@ function approveUser(uid) {
   _db.ref(P.ROOT + '/users/' + uid).update(upd)
     .then(function () { showToast('승인했습니다 (' + (+ym.slice(5)) + '월 ' + P.groupName(_users[uid].group) + '날)'); }, function (e) { showToast('실패: ' + e.message); });
 }
-var _editUid = null;
+var _editUid = null, _editG = [];
 function editUser(uid) {
   var p = _users[uid];
   _editUid = uid;
   document.getElementById('eEmail').textContent = p.email || '';
   document.getElementById('eName').value = p.name || '';
   document.getElementById('ePlate').value = p.plate || '';
+  // 마스터는 이번 달·다음 달 그룹(홀수날/짝수날)을 언제든 바꿀 수 있음
+  document.getElementById('eGroups').classList.toggle('hidden', !_master);
+  if (_master) {
+    var ym = P.today().slice(0, 7), next = P.addMonths(ym, 1), req = p.groupReq || {};
+    document.getElementById('eG0Lab').textContent = (+ym.slice(5)) + '월 그룹 (이번 달)';
+    document.getElementById('eG1Lab').textContent = (+next.slice(5)) + '월 그룹 (다음 달)';
+    // 지금 적용 중인 그룹을 보여 주고, 바꾼 달만 저장함 (이름만 고칠 때 그룹 요청이 저절로 처리되지 않게)
+    _editG = [P.groupOf(p, ym + '-15') || 'odd', P.groupOf(p, next + '-15') || 'odd'];
+    document.getElementById('eG0').value = _editG[0];
+    document.getElementById('eG1').value = _editG[1];
+    var reqs = [ym, next].filter(function (m) { return req[m] && req[m] !== (p.groups && p.groups[m]); })
+      .map(function (m) { return (+m.slice(5)) + '월 ' + P.groupName(req[m]) + '날'; });
+    document.getElementById('eReq').innerHTML = (reqs.length
+      ? '<span class="warn">직원 변경 요청: ' + reqs.join(', ') + '</span><br>요청대로 하려면 위에서 그 그룹을 고르고 저장하세요. '
+      : '') + '바꾼 그룹은 다음 배정부터 적용되고, 이미 발표된 배정은 바뀌지 않습니다.';
+  }
   document.getElementById('editModal').classList.remove('hidden');
   document.getElementById('eName').focus();
 }
@@ -538,7 +561,15 @@ function closeEdit() { _editUid = null; document.getElementById('editModal').cla
 function saveEdit() {
   var name = document.getElementById('eName').value.trim(), plate = document.getElementById('ePlate').value.trim();
   if (!name || !plate) { showToast('이름과 차량번호를 입력하세요'); return; }
-  _db.ref(P.ROOT + '/users/' + _editUid).update({ name: name, plate: plate })
+  var upd = { name: name, plate: plate };
+  if (_master) {
+    var ym = P.today().slice(0, 7), next = P.addMonths(ym, 1), p = _users[_editUid], req = p.groupReq || {};
+    [[ym, document.getElementById('eG0').value, _editG[0]], [next, document.getElementById('eG1').value, _editG[1]]].forEach(function (m) {
+      // 바꿨거나, 직원 요청과 같은 그룹을 골라 저장하면 그 달 그룹을 확정하고 요청은 처리된 것으로 정리
+      if (m[1] !== m[2] || (req[m[0]] && req[m[0]] === m[1])) { upd['groups/' + m[0]] = m[1]; upd['groupReq/' + m[0]] = null; }
+    });
+  }
+  _db.ref(P.ROOT + '/users/' + _editUid).update(upd)
     .then(function () { closeEdit(); showToast('저장했습니다'); }, function (e) { showToast('저장 실패: ' + e.message); });
 }
 function deleteUser(uid) {
