@@ -372,7 +372,10 @@ function enter() {
     document.getElementById('groupMonth').value = (nav.tab === 'group' && nav.arg) || P.addMonths(P.today().slice(0, 7), 1);
     _wk = (nav.tab === 'week' && nav.arg) || P.nextWeek();
     if (nav.tab && _vis[nav.tab]) _tab = nav.tab;
-    on('users', function (v) { var first = !Object.keys(_users).length; _users = v || {}; renderAll(); if (first) advance(); });
+    on('users', function (v) {
+      var first = !Object.keys(_users).length; _users = v || {}; renderAll();
+      if (first) { advance(); if (_tab === 'stats') loadStats(); }   // 통계 탭으로 바로 들어온 경우 명단이 온 뒤 다시 그림
+    });
     on('holidays', function (v) { _holidays = v || {}; renderHolidays(); renderWeek(); });
     on('notices', function (v) { _notices = v || {}; renderNotices(); });
     watchDay();

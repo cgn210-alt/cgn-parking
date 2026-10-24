@@ -249,7 +249,8 @@ var Parking = (function () {
       Object.keys(seats).forEach(function (u) {
         var s = seats[u], r = p(u);
         if (s.lot === 'wait') { r.waitOnly++; d.wait++; return; }
-        r[s.lot]++; d[s.lot]++;
+        r[s.lot]++;
+        if (HOLDING[s.status]) d[s.lot]++;   // 날짜별 칸은 실제로 자리를 차지한 수 (반납·해제 뒤 승계한 사람과 겹치지 않게)
         if (USED[s.status]) r.used++;
         if (s.status === 'returned') r.returned++;
         if (s.status === 'released') r.released++;

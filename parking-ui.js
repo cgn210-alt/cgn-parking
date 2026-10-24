@@ -66,7 +66,7 @@ var ParkingUI = (function (P) {
       var x = st.person[a] || {}, y = st.person[b] || {};
       return (x.used || 0) - (y.used || 0) || String((users[a] || {}).name).localeCompare(String((users[b] || {}).name), 'ko');
     });
-    out += '<div class="lot-title"><span>사람별 (이용 적은 순)</span></div><div class="tbl"><table><thead><tr>' +
+    out += '<div class="lot-title"><span>사람별 (이용 적은 순)</span></div><div class="tbl"><table class="grid"><thead><tr>' +
       '<th>이름</th><th>그룹</th><th class="num">신청</th><th class="num">별관</th><th class="num">남경</th><th class="num">이용</th>' +
       '<th class="num">반납</th><th class="num">미도착</th><th class="num">미배정</th><th class="num">배정률</th></tr></thead><tbody>' +
       ids.map(function (u) {
@@ -78,7 +78,7 @@ var ParkingUI = (function (P) {
       }).join('') + '</tbody></table></div>';
 
     var dates = Object.keys(st.daily).sort();
-    out += '<div class="lot-title"><span>날짜별</span></div><div class="tbl"><table><thead><tr>' +
+    out += '<div class="lot-title"><span>날짜별</span></div><div class="tbl"><table class="grid"><thead><tr>' +
       '<th>날짜</th><th>그룹</th><th class="num">신청</th><th class="num">별관</th><th class="num">남경</th><th class="num">대기</th></tr></thead><tbody>' +
       (dates.length ? dates.map(function (k) {
         var d = st.daily[k];
@@ -109,6 +109,58 @@ var ParkingUI = (function (P) {
       '<div class="n-title">' + esc(n.title) + '</div>' +
       '<div class="n-body">' + esc(n.body).replace(/\n/g, '<br>') + '</div>' +
       '<div class="n-meta">' + (d ? (d.getUTCMonth() + 1) + '/' + d.getUTCDate() + ' 수정' : '') + (actions || '') + '</div></div>';
+  }
+
+  // ── 좁은 화면에서 넘치는 표는 줄마다 '항목: 값' 카드로 바꿔 위아래로만 스크롤되게 함 ──
+  // 각 칸에 머리글(th) 글자를 data-label 로 붙이고, 표가 칸보다 넓으면 stack 클래스를 붙임
+  var STACK_CSS =
+    'table.grid.stack, table.grid.stack tbody, table.grid.stack tr, table.grid.stack td { display:block; width:100%; }' +
+    'table.grid.stack { border:none; white-space:normal; }' +
+    'table.grid.stack thead { display:none; }' +
+    // 카드 안은 두 칸으로 나눠 높이를 줄이고, 첫 칸(이름·날짜)과 처리 버튼은 한 줄 전체를 씀
+    'table.grid.stack tr { display:grid; grid-template-columns:1fr 1fr; column-gap:16px; border:1px solid var(--border); border-radius:10px; padding:8px 10px; margin-bottom:8px; background:var(--surface); }' +
+    'table.grid.stack tr.sec { display:block; border:none; padding:10px 2px 2px; margin:0; background:none; }' +
+    'table.grid.stack td:first-child, table.grid.stack td.acts { grid-column:1 / -1; }' +
+    'table.grid.stack td:first-child { font-weight:700; font-size:14px; border-bottom:1px solid var(--border); padding-bottom:6px; margin-bottom:2px; }' +
+    'table.grid.stack td { display:flex; justify-content:space-between; align-items:center; gap:12px; border:none; padding:4px 0; text-align:right; white-space:normal; background:none; }' +
+    'table.grid.stack td::before { content:attr(data-label); color:var(--text-muted); font-size:11.5px; font-weight:500; text-align:left; flex-shrink:0; }' +
+    'table.grid.stack td:not([data-label])::before, table.grid.stack td[data-label=""]::before { content:none; }' +
+    'table.grid.stack tr.sec td, table.grid.stack td[colspan] { display:block; text-align:left; padding:0; }' +
+    'table.grid.stack td.acts { flex-wrap:wrap; justify-content:flex-end; }' +
+    'table.grid.stack tr.me, table.grid.stack tr.pending, table.grid.stack tr.pickrow.on { background:var(--accent-bg); }' +
+    'table.grid.stack tr.me td, table.grid.stack tr.pending td, table.grid.stack tr.pickrow.on td { background:none; }' +
+    '.tbl:has(> table.grid.stack) { overflow:visible; }';
+
+  function label(table) {
+    var heads = [].map.call(table.querySelectorAll('thead th'), function (th) { return th.textContent.trim(); });
+    if (!heads.length) return;
+    [].forEach.call(table.querySelectorAll('tbody tr'), function (tr) {
+      if (tr.classList.contains('sec')) return;
+      var i = 0;
+      [].forEach.call(tr.children, function (td) {
+        if (!td.hasAttribute('colspan')) td.setAttribute('data-label', heads[i] || '');
+        i += +(td.getAttribute('colspan') || 1);
+      });
+    });
+  }
+  function fit(table) {
+    var box = table.parentNode;
+    table.classList.remove('stack');
+    if (box && table.scrollWidth > box.clientWidth + 2) table.classList.add('stack');
+  }
+  function fitAll() { [].forEach.call(document.querySelectorAll('table.grid'), function (t) { label(t); fit(t); }); }
+
+  if (typeof document !== 'undefined') {
+    var st = document.createElement('style');
+    st.textContent = STACK_CSS;
+    document.head.appendChild(st);
+    var pending = false;
+    var run = function () { if (pending) return; pending = true; requestAnimationFrame(function () { pending = false; fitAll(); }); };
+    // 내용이 바뀌거나 숨겨진 탭이 열릴 때(class 변경) 다시 맞춤. 표 자신의 stack 표시 변경은 무시
+    new MutationObserver(function (recs) {
+      if (recs.some(function (r) { return r.type === 'childList' || r.target.tagName !== 'TABLE'; })) run();
+    }).observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+    window.addEventListener('resize', run);
   }
 
   return {
