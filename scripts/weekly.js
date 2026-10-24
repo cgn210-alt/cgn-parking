@@ -53,11 +53,15 @@ const get = async (path) => (await P.ref(db, path).once('value')).val();
 
 async function main() {
   const wk = P.nextWeek();
-  const sc = P.schedule(wk);
   console.log(`대상 주: ${wk} (지금 ${new Date().toISOString()})`);
 
-  // 1) 신청 일정
-  await P.ensureWeek(db, wk);
+  // 1) 신청 일정 (마스터가 미리 바꿔 둔 일정이 있으면 그대로 두고 그 시각을 따름)
+  if (!(await get('weeks/' + wk)) && Date.now() >= P.schedule(wk).openAt - 3600000) await P.ensureWeek(db, wk);
+  const week = await get('weeks/' + wk);
+  if (!week) { console.log('아직 신청 일정 전'); return; }
+  const sc = P.schedule(wk, week);
+  console.log(`일정: 신청 ${P.when(sc.openAt)} ~ ${P.when(sc.closeAt)}, 발표 ${P.when(sc.publishAt)}`);
+  if (week.publishedAt) { await sendMails(wk); return; }   // 이미 발표된 주 → 못 보낸 메일만
   if (Date.now() < sc.closeAt - 20 * 60000) { console.log('신청 일정 확인 완료'); return; }
 
   // 2) 마감 뒤 배정안

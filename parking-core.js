@@ -57,10 +57,14 @@ var Parking = (function () {
   function mondayOf(key) { return addDays(key, -((dow(key) + 6) % 7)); }
   // 지금 신청·발표 대상인 '다음 주'의 월요일 (금요일 신청 → 다음 주 월~금)
   function nextWeek() { return addDays(mondayOf(today()), 7); }
-  function schedule(wk) {
+  // 기본 일정(직전 금요일 2:00 / 2:30 / 4:00). week 를 주면 마스터가 바꿔 저장한 일정이 우선
+  function schedule(wk, week) {
+    if (week && week.openAt) return { openAt: week.openAt, closeAt: week.closeAt, publishAt: week.publishAt, custom: !!week.custom };
     var fri = addDays(wk, -3);
     return { openAt: at(fri, OPEN_HM[0], OPEN_HM[1]), closeAt: at(fri, CLOSE_HM[0], CLOSE_HM[1]), publishAt: at(fri, PUBLISH_HM[0], PUBLISH_HM[1]) };
   }
+  // 'M/D(요일) 오후 2:00' 형태
+  function when(ms) { return shortLabel(dateKey(ms)) + ' ' + hm(ms); }
   function isHoliday(key, overrides) {
     var o = overrides && overrides[key];
     if (o !== undefined && o !== null) return o !== false && o !== '';
@@ -331,14 +335,18 @@ var Parking = (function () {
     });
   }
 
-  // 시간이 된 단계를 순서대로 진행 (누가 열든 한 번만 실행됨)
+  // 시간이 된 단계를 순서대로 진행 (누가 열든 한 번만 실행됨). 마스터가 바꾼 일정이 있으면 그 시각을 따름
   function advance(db, users, canDraft) {
-    var wk = nextWeek(), sc = schedule(wk), t = now();
-    var p = Promise.resolve();
-    if (t >= sc.openAt - 3600000) p = p.then(function () { return ensureWeek(db, wk); });
-    if (canDraft && t >= sc.closeAt) p = p.then(function () { return ensureDraft(db, wk, users); });
-    if (t >= sc.publishAt) p = p.then(function () { return publish(db, wk, users); });
-    return p.then(function () { return ensureSwept(db, today(), users); });
+    var wk = nextWeek(), t = now();
+    return val(ref(db, 'weeks/' + wk).once('value')).then(function (w) {
+      var p = Promise.resolve();
+      if (!w && t >= schedule(wk).openAt - 3600000) p = p.then(function () { return ensureWeek(db, wk); });
+      if (w && !w.publishedAt) {
+        if (canDraft && t >= w.closeAt) p = p.then(function () { return ensureDraft(db, wk, users); });
+        if (t >= w.publishAt) p = p.then(function () { return publish(db, wk, users); });
+      }
+      return p;
+    }).then(function () { return ensureSwept(db, today(), users); });
   }
 
   function ensureSwept(db, key, users) {
@@ -383,7 +391,7 @@ var Parking = (function () {
     setOffset: setOffset, now: now, dateKey: dateKey, at: at, addDays: addDays, today: today, dow: dow,
     releaseTime: releaseTime, dayGroup: dayGroup, groupName: groupName, label: label, shortLabel: shortLabel,
     hm: hm, monthOf: monthOf, addMonths: addMonths,
-    mondayOf: mondayOf, nextWeek: nextWeek, schedule: schedule, isHoliday: isHoliday, holidayName: holidayName,
+    mondayOf: mondayOf, nextWeek: nextWeek, schedule: schedule, when: when, isHoliday: isHoliday, holidayName: holidayName,
     weekDays: weekDays, groupOf: groupOf, annexOk: annexOk,
     monthCounts: monthCounts, allocate: allocate, allocateWeek: allocateWeek, fill: fill, sweep: sweep,
     giveBack: giveBack, joinWait: joinWait, waitingOf: waitingOf, stats: stats, penalized: penalized,
