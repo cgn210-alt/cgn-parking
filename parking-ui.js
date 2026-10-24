@@ -119,19 +119,27 @@ var ParkingUI = (function (P) {
     'table.grid.stack thead { display:none; }' +
     // 카드 안은 두 칸으로 나눠 높이를 줄이고, 제목(이름·날짜)·긴 값(이메일 등)·처리 버튼은 한 줄 전체를 씀
     'table.grid.stack td { min-width:0; overflow-wrap:anywhere; }' +
-    'table.grid.stack tr { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); column-gap:16px; border:1px solid var(--border); border-radius:10px; padding:8px 10px; margin-bottom:8px; background:var(--surface); }' +
+    'table.grid.stack tr { display:grid; grid-template-columns:repeat(auto-fill, minmax(90px, 1fr)); column-gap:12px; border:1px solid var(--border); border-radius:10px; padding:8px 10px; margin-bottom:8px; background:var(--surface); }' +
     'table.grid.stack tr.sec { display:block; border:none; padding:10px 2px 2px; margin:0; background:none; }' +
     'table.grid.stack td.ttl, table.grid.stack td.wide, table.grid.stack td.acts { grid-column:1 / -1; }' +
-    'table.grid.stack td.ttl { order:-1; font-weight:700; font-size:14.5px; border-bottom:1px solid var(--border); padding-bottom:6px; margin-bottom:2px; }' +
+    'table.grid.stack td.ttl { order:-1; font-weight:700; font-size:15px; padding-bottom:6px; }' +
     'table.grid.stack td.ttl::before { content:none; }' +
     'table.grid.stack td.ttl { justify-content:flex-start; text-align:left; }' +
     'table.grid.stack td.nolab { display:none; }' +
+    // '상태' 칸이 있는 줄은 상태 표시를 제목 줄 오른쪽에 붙임 (따로 한 줄을 차지하지 않게)
+    'table.grid.stack tr.hasst td.ttl { grid-column:1 / -2; }' +
+    'table.grid.stack td.st { order:-1; grid-column:-2 / -1; align-items:flex-end; justify-content:center; padding-bottom:6px; }' +
+    'table.grid.stack td.st::before { content:none; }' +
     'table.grid.stack td.wide { order:1; } table.grid.stack td.acts { order:2; }' +   // 짧은 값끼리 두 칸씩 채운 뒤 긴 값, 마지막에 버튼
-    'table.grid.stack td { display:flex; justify-content:space-between; align-items:center; gap:12px; border:none; padding:4px 0; text-align:right; white-space:normal; background:none; }' +
-    'table.grid.stack td::before { content:attr(data-label); color:var(--text-muted); font-size:11.5px; font-weight:500; text-align:left; flex-shrink:0; }' +
+    // 항목 이름은 값 바로 위에 작게, 모두 왼쪽 정렬 (눈이 좌우로 오가지 않게)
+    'table.grid.stack td { display:flex; flex-direction:column; align-items:flex-start; gap:1px; border:none; padding:5px 0; text-align:left !important; white-space:normal; background:none; font-size:13.5px; }' +
+    'table.grid.stack td::before { content:attr(data-label); color:var(--text-muted); font-size:11px; font-weight:500; }' +
+    'table.grid.stack td.acts { flex-direction:row; flex-wrap:wrap; gap:6px; border-top:1px solid var(--border); margin-top:4px; padding-top:9px; }' +
+    'table.grid.stack td.acts::before { content:none; }' +
+    'table.grid.stack td.ttl { flex-direction:row; align-items:center; gap:8px; }' +
     'table.grid.stack td:not([data-label])::before, table.grid.stack td[data-label=""]::before { content:none; }' +
     'table.grid.stack tr.sec td, table.grid.stack td[colspan] { display:block; text-align:left; padding:0; }' +
-    'table.grid.stack td.acts { flex-wrap:wrap; justify-content:flex-end; }' +
+    'table.grid.stack td.acts { flex-wrap:wrap; justify-content:flex-start; }' +
     'table.grid.stack tr.me, table.grid.stack tr.pending, table.grid.stack tr.pickrow.on { background:var(--accent-bg); }' +
     'table.grid.stack tr.me td, table.grid.stack tr.pending td, table.grid.stack tr.pickrow.on td { background:none; }' +
     '.tbl:has(> table.grid.stack) { overflow:visible; }';
@@ -144,7 +152,7 @@ var ParkingUI = (function (P) {
     if (!heads.length) return;
     [].forEach.call(table.querySelectorAll('tbody tr'), function (tr) {
       if (tr.classList.contains('sec')) return;
-      var i = 0, titled = false;
+      var i = 0, titled = false, hasSt = false;
       [].forEach.call(tr.children, function (td) {
         if (td.hasAttribute('colspan')) { i += +td.getAttribute('colspan'); return; }
         var lab = heads[i] || '', text = td.textContent.trim();
@@ -154,8 +162,11 @@ var ParkingUI = (function (P) {
         mark(td, 'ttl', ttl);
         mark(td, 'nolab', lab === '번호');                                         // 의미 없는 일련번호는 카드에서 숨김
         mark(td, 'wide', !ttl && (text.indexOf('@') >= 0 || text.length > 14));  // 긴 값은 한 줄 전체
+        mark(td, 'st', lab === '상태');
+        if (lab === '상태') hasSt = true;
         i++;
       });
+      mark(tr, 'hasst', hasSt);
     });
   }
   function fit(table) {
