@@ -114,6 +114,9 @@ var ParkingUI = (function (P) {
   // ── 좁은 화면에서 넘치는 표는 줄마다 '항목: 값' 카드로 바꿔 위아래로만 스크롤되게 함 ──
   // 각 칸에 머리글(th) 글자를 data-label 로 붙이고, 표가 칸보다 넓으면 stack 클래스를 붙임
   var STACK_CSS =
+    // 표 안 버튼은 한 줄로, 머리글·값은 글자 중간이 아니라 단어 단위로만 줄바꿈
+    'table.grid td .btn { white-space:nowrap; }' +
+    'table.grid th, table.grid td { word-break:keep-all; }' +
     // 1단계: 글자·여백을 줄인 촘촘한 표 (휴대폰에서도 PC처럼 표 모양 유지)
     // 값은 줄바꿈하지 않음 (억지로 좁혀 이름이 여러 줄로 끊기면 카드가 낫기 때문). 머리글만 줄바꿈 허용
     'table.grid.compact { font-size:11.5px; white-space:nowrap; }' +

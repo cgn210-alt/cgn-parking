@@ -304,9 +304,9 @@
   </div>
 </div>
 
-<script src="firebase-config.js?v=12"></script>
-<script src="parking-core.js?v=12"></script>
-<script src="parking-ui.js?v=12"></script>
+<script src="firebase-config.js?v=13"></script>
+<script src="parking-core.js?v=13"></script>
+<script src="parking-ui.js?v=13"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -848,12 +848,12 @@ function renderDay() {
   document.getElementById('dayBoard').innerHTML = board;
 }
 function dayActions(u, s) {
-  if (s.status === 'ok') return act('주차 완료', 'adminCheckIn', u) + act('해제', 'adminRelease', u);
-  if (s.status === 'in') return act('반납 처리', 'adminReturn', u);
-  if (s.status === 'wait') return act('대기 취소', 'adminReturn', u);
+  if (s.status === 'ok') return act('도착', 'adminCheckIn', u) + act('해제', 'adminRelease', u);
+  if (s.status === 'in') return act('반납', 'adminReturn', u);
+  if (s.status === 'wait') return act('취소', 'adminReturn', u);
   if (s.status === 'released') return _dayWaivers[u]
-    ? '<span class="badge">패널티 면제됨</span>' + act('면제 취소', 'unwaive', u)
-    : '<span class="badge pin">미도착 패널티</span>' + act('패널티 면제', 'waive', u);
+    ? '<span class="badge">면제됨</span>' + act('면제 취소', 'unwaive', u)
+    : '<span class="badge pin">패널티</span>' + act('면제', 'waive', u);
   return '';
 }
 function waive(u) {
