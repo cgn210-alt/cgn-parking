@@ -14,26 +14,30 @@ var ParkingUI = (function (P) {
     return s.lateAt ? '<span class="badge">늦은 등록</span>' : '';
   }
 
-  // 별관·남경·대기 현황판. opt.me: 강조할 사람, opt.actions(uid, seat): 줄 끝에 붙일 버튼 HTML
+  // 별관·남경·대기 현황표. opt.key: 날짜, opt.me: 강조할 사람, opt.actions(uid, seat): 마지막 칸 버튼 HTML
   function boardHtml(day, users, opt) {
     opt = opt || {};
     var seats = (day && day.seats) || {};
-    var out = '';
+    var cols = opt.actions ? 6 : 5;
+    var out = '<div class="tbl"><table class="grid"><thead><tr><th class="num">순번</th><th>이름</th><th>차량번호</th><th>그룹</th><th>상태</th>' +
+      (opt.actions ? '<th>처리</th>' : '') + '</tr></thead><tbody>';
     ['annex', 'nam', 'wait'].forEach(function (lot) {
       var list = Object.keys(seats).filter(function (u) { return seats[u].lot === lot; })
         .sort(function (a, b) { return rank(seats[a]) - rank(seats[b]) || (seats[a].order || 99) - (seats[b].order || 99); });
       var holding = list.filter(function (u) { return /^(ok|in)$/.test(seats[u].status); }).length;
-      out += '<div class="lot-title ' + lot + '"><span>' + LOT_NAME[lot] + '</span><span>' +
-        (lot === 'wait' ? list.length + '명' : holding + ' / ' + P.LOTS[lot].cap) + '</span></div>';
-      if (!list.length) out += '<div class="empty">없음</div>';
+      out += '<tr class="sec ' + lot + '"><td colspan="' + cols + '">' + LOT_NAME[lot] + ' · ' +
+        (lot === 'wait' ? list.length + '명' : holding + ' / ' + P.LOTS[lot].cap + '대') + '</td></tr>';
+      if (!list.length) out += '<tr><td colspan="' + cols + '" class="empty">없음</td></tr>';
       list.forEach(function (u, i) {
         var p = users[u] || {}, s = seats[u];
-        out += '<div class="row' + (u === opt.me ? ' me' : '') + '"><span class="no">' + (lot === 'wait' ? s.order : i + 1) + '</span>' +
-          '<span class="nm">' + esc(p.name || '(삭제됨)') + ' <span class="pl">' + esc(p.plate || '') + '</span></span>' +
-          statusBadge(s) + (opt.actions ? opt.actions(u, s) : '') + '</div>';
+        out += '<tr' + (u === opt.me ? ' class="me"' : '') + '><td class="num">' + (lot === 'wait' ? s.order : i + 1) + '</td>' +
+          '<td>' + esc(p.name || '(삭제됨)') + '</td><td>' + esc(p.plate || '') + '</td>' +
+          '<td>' + (opt.key ? P.groupName(P.groupOf(p, opt.key)) : '') + '</td>' +
+          '<td>' + (statusBadge(s) || '<span class="badge">대기</span>') + '</td>' +
+          (opt.actions ? '<td class="acts">' + opt.actions(u, s) + '</td>' : '') + '</tr>';
       });
     });
-    return out;
+    return out + '</tbody></table></div>';
   }
 
   function pct(a, b) { return b ? Math.round(a / b * 100) + '%' : '-'; }
@@ -102,7 +106,7 @@ var ParkingUI = (function (P) {
   function noticeHtml(n, actions) {
     var d = n.at ? new Date(n.at + 9 * 3600000) : null;
     return '<div class="notice' + (n.pinned ? ' pinned' : '') + '">' +
-      '<div class="n-title">' + (n.pinned ? '<span class="badge pin">고정</span> ' : '') + esc(n.title) + '</div>' +
+      '<div class="n-title">' + esc(n.title) + '</div>' +
       '<div class="n-body">' + esc(n.body).replace(/\n/g, '<br>') + '</div>' +
       '<div class="n-meta">' + (d ? (d.getUTCMonth() + 1) + '/' + d.getUTCDate() + ' 수정' : '') + (actions || '') + '</div></div>';
   }

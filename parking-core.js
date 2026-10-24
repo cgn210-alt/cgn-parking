@@ -121,8 +121,9 @@ var Parking = (function () {
              tieBreak(key, a) - tieBreak(key, b);
     }
     var seats = {};
-    // 별관: 우선 배정 대상 + 그날 그룹
-    list.filter(function (u) { return users[u].priority || groupOf(users[u], key) === g; })
+    // 별관: 그날 그룹만 (홀수날 = 홀수 그룹, 짝수날 = 짝수 그룹). 우선 배정 대상은 그 안에서 먼저.
+    // 별관이 본관과 가깝고 남경은 멀어서, 별관은 자기 그룹 날에만 쓸 수 있게 고정
+    list.filter(function (u) { return groupOf(users[u], key) === g; })
       .sort(cmp).slice(0, LOTS.annex.cap)
       .forEach(function (u, i) { seats[u] = { lot: 'annex', order: i + 1, status: 'ok' }; });
     // 남경: 별관에 못 들어간 모든 신청자, 나머지는 대기
@@ -166,7 +167,10 @@ var Parking = (function () {
       .sort(function (a, b) { return seats[a].order - seats[b].order; });
   }
 
-  // 빈자리를 대기 순번대로 채움 (별관은 그날 그룹 대기자를 먼저)
+  // 별관을 쓸 수 있는 사람인지 (그날 그룹만)
+  function annexOk(u, key) { return !!u && groupOf(u, key) === dayGroup(key); }
+
+  // 빈자리를 대기 순번대로 채움 (별관 빈자리는 그날 그룹 대기자만 받음)
   function fill(day, users, t, key) {
     var seats = day.seats || (day.seats = {});
     var waiting = waitingOf(seats);
@@ -177,10 +181,9 @@ var Parking = (function () {
       while (free > 0 && waiting.length) {
         var idx = 0;
         if (lot === 'annex') {
-          for (var j = 0; j < waiting.length; j++) {
-            var w = users[waiting[j]];
-            if (w && (w.priority || groupOf(w, key || '9999-12') === day.group)) { idx = j; break; }
-          }
+          idx = -1;
+          for (var j = 0; j < waiting.length; j++) { if (key && annexOk(users[waiting[j]], key)) { idx = j; break; } }
+          if (idx < 0) break;
         }
         var u = waiting.splice(idx, 1)[0];
         seats[u] = { lot: lot, order: 0, status: 'ok', promotedAt: t };
@@ -380,7 +383,7 @@ var Parking = (function () {
     releaseTime: releaseTime, dayGroup: dayGroup, groupName: groupName, label: label, shortLabel: shortLabel,
     hm: hm, monthOf: monthOf, addMonths: addMonths,
     mondayOf: mondayOf, nextWeek: nextWeek, schedule: schedule, isHoliday: isHoliday, holidayName: holidayName,
-    weekDays: weekDays, groupOf: groupOf,
+    weekDays: weekDays, groupOf: groupOf, annexOk: annexOk,
     monthCounts: monthCounts, allocate: allocate, allocateWeek: allocateWeek, fill: fill, sweep: sweep,
     giveBack: giveBack, joinWait: joinWait, waitingOf: waitingOf, stats: stats, penalized: penalized,
     ref: ref, readDays: readDays, readApps: readApps, ensureWeek: ensureWeek, ensureDraft: ensureDraft,

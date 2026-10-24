@@ -80,6 +80,18 @@
     th { font-size:11.5px; color:var(--text-muted); font-weight:500; border-top:none; }
     td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; }
     tr.me td { background:var(--accent-bg); }
+    table.grid { border:1px solid var(--border); }
+    table.grid th { background:var(--surface-sub); border-bottom:1px solid var(--border); padding:7px 6px; }
+    table.grid td { vertical-align:middle; }
+    tr.sec td { background:var(--surface-sub); font-weight:700; font-size:12.5px; }
+    tr.sec.annex td { color:var(--annex); } tr.sec.nam td { color:var(--nam); } tr.sec.wait td { color:var(--wait); }
+    tr.pending td { background:var(--accent-bg); }
+    td.acts { white-space:nowrap; }
+    td .btn { font-size:11.5px; padding:4px 8px; margin-right:3px; }
+    td select { font-family:var(--font); font-size:12px; padding:4px 6px; border:1px solid var(--border); border-radius:6px; background:var(--surface-sub); }
+    td.off { text-decoration:line-through; color:var(--text-muted); }
+    .kv td:first-child { color:var(--text-muted); width:90px; }
+    .warn-cell { color:var(--danger); font-weight:700; }
     .notice { padding:12px 0; border-top:1px solid var(--border); }
     .notice:first-child { border-top:none; padding-top:0; }
     .n-title { font-size:14px; font-weight:700; margin-bottom:4px; }
@@ -256,7 +268,7 @@
 var P = Parking, U = ParkingUI, esc = U.esc;
 var _db = null, _users = {}, _holidays = {}, _notices = {}, _admins = {};
 var _refs = [], _dayRefs = [], _weekRefs = [], _myAdminRef = null, _adminsRef = null, _started = false;
-var _day = null, _wk = null, _week = null, _apps = {}, _draft = null;
+var _day = null, _wk = null, _week = null, _apps = {}, _draft = null, _weekDays = {};
 var _me = null, _perms = {}, _master = false, _tab = null, _vis = {}, _editNotice = null;
 var TABS = ['users', 'group', 'week', 'day', 'stats', 'notice', 'holiday', 'admins'];
 // 마스터가 관리자에게 골라서 줄 수 있는 권한
@@ -276,7 +288,8 @@ var DEFAULT_NOTICES = [
     '별관에 주차한 차량은 퇴근 시까지 출차가 어렵습니다.\n근무 중 차량을 써야 하는 날은 신청 전에 참고해 주세요.' },
   { pinned: false, title: '배정 기준과 반납 안내', body:
     '하루 별관 8면, 남경 5면 모두 13면입니다.\n' +
-    '별관은 그날 그룹(홀수날/짝수날) 신청자에게 먼저, 남경은 그 밖의 신청자에게 배정하며, 이번 달 이용 횟수가 적은 사람부터 배정합니다.\n' +
+    '별관은 본관과 가까워 그룹 날에만 이용합니다. 홀수날에는 홀수 그룹, 짝수날에는 짝수 그룹 신청자만 별관에 배정됩니다.\n' +
+    '그 밖의 신청자와 별관에 들지 못한 신청자는 남경에 배정하며, 이번 달 이용 횟수가 적은 사람부터 배정합니다.\n' +
     '배정 후 못 오게 되면 꼭 반납해 주세요. 당일 오전 9시까지 \'주차 완료\'를 누르지 않으면 대기자에게 넘어갑니다.\n' +
     '반납 없이 오지 않은 경우(미도착)는 다른 사람의 이용 기회를 막은 것으로 보고, 다음 주 배정에서 제외됩니다.\n' +
     '매달 홀수날·짝수날 그룹을 골라 승인 요청하며, 관리자가 양쪽 인원을 맞춰 승인합니다.' }
@@ -442,24 +455,24 @@ function renderUsers() {
     return (_users[a].approved ? 1 : 0) - (_users[b].approved ? 1 : 0) ||
       String(_users[a].name).localeCompare(String(_users[b].name), 'ko');
   });
-  var html = '', cu = can('users'), cp = can('priority');
-  ids.forEach(function (u) {
+  var cu = can('users'), cp = can('priority');
+  var rows = ids.map(function (u, i) {
     var p = _users[u];
-    html += '<div class="user' + (p.approved ? '' : ' pending') + '">' +
-      '<div><div class="u-name">' + esc(p.name) + ' · ' + esc(p.plate) + '</div><div class="u-sub">' + esc(p.email) +
-      ' · 이번 달 ' + P.groupName(P.groupOf(p, t)) + '날</div></div>' +
-      '<div class="u-ctrl">' +
-        (cp ? '<label class="chk"><input type="checkbox"' + (p.priority ? ' checked' : '') + ' onchange="setUser(\'' + u + '\',\'priority\',this.checked)" />우선</label>'
-          : (p.priority ? '<span class="badge">우선</span>' : '')) +
-        (cu ? (p.approved
+    return '<tr' + (p.approved ? '' : ' class="pending"') + '><td class="num">' + (i + 1) + '</td>' +
+      '<td><b>' + esc(p.name) + '</b></td><td>' + esc(p.plate) + '</td><td>' + esc(p.email) + '</td>' +
+      '<td>' + P.groupName(P.groupOf(p, t)) + '날</td>' +
+      '<td>' + (cp ? '<input type="checkbox"' + (p.priority ? ' checked' : '') + ' onchange="setUser(\'' + u + '\',\'priority\',this.checked)" />' : (p.priority ? '우선' : '-')) + '</td>' +
+      '<td>' + (p.approved ? '<span class="badge in">승인</span>' : '<span class="badge pin">승인 대기</span>') + '</td>' +
+      (cu ? '<td class="acts">' + (p.approved
           ? '<button class="btn" onclick="setUser(\'' + u + '\',\'approved\',false)">승인 취소</button>'
           : '<button class="btn btn-primary" onclick="approveUser(\'' + u + '\')">승인</button>') +
           '<button class="btn" onclick="editUser(\'' + u + '\')">수정</button>' +
-          '<button class="btn btn-danger" onclick="deleteUser(\'' + u + '\')">삭제</button>'
-          : (p.approved ? '' : '<span class="badge">승인 대기</span>')) +
-      '</div></div>';
-  });
-  document.getElementById('userList').innerHTML = html || '<div class="empty">등록된 직원이 없습니다</div>';
+          '<button class="btn btn-danger" onclick="deleteUser(\'' + u + '\')">삭제</button></td>' : '') + '</tr>';
+  }).join('');
+  document.getElementById('userList').innerHTML = rows
+    ? '<div class="tbl"><table class="grid"><thead><tr><th class="num">번호</th><th>이름</th><th>차량번호</th><th>이메일</th><th>이번 달 그룹</th><th>우선 배정</th><th>상태</th>' +
+      (cu ? '<th>처리</th>' : '') + '</tr></thead><tbody>' + rows + '</tbody></table></div>'
+    : '<div class="empty">등록된 직원이 없습니다</div>';
 }
 function setUser(uid, field, val) {
   var upd = {};
@@ -507,24 +520,33 @@ function renderGroups() {
     if (w > 0 && w < 6 && !P.isHoliday(k, _holidays)) days[P.dayGroup(k)]++;
   }
   var diff = Math.abs(eff.odd - eff.even);
+  var unbalanced = diff > Math.max(2, Math.round(ids.length * 0.1));
+  // 별관 1면당 그 달 이용 기회 = 별관 8면 × 그룹 날 수 ÷ 그룹 인원
+  var per = function (g) { return eff[g] ? (P.LOTS.annex.cap * days[g] / eff[g]).toFixed(1) + '회' : '-'; };
   document.getElementById('groupSummary').innerHTML =
-    (+ym.slice(5)) + '월 그룹 (승인 반영): 홀수 <b>' + eff.odd + '명</b> · 짝수 <b>' + eff.even + '명</b>' +
-    (diff > Math.max(2, Math.round(ids.length * 0.1)) ? ' <span class="warn">· ' + diff + '명 차이</span>' : ' · 균형 양호') +
-    '<br>평일 수(공휴일 제외): 홀수날 ' + days.odd + '일 · 짝수날 ' + days.even + '일' +
-    '<br>직원 요청: 홀수 ' + req.odd + '명 · 짝수 ' + req.even + '명 · 승인 대기 <b>' + pending.length + '건</b>' +
-    (cu && pending.length ? '<div class="toolbar" style="margin:8px 0 0;"><button class="btn btn-primary" onclick="approveAllGroups()">요청대로 모두 승인</button></div>' : '') +
-    '<div class="note">요청이 없는 사람은 지난달 그룹이 그대로 이어집니다. 한쪽에 몰리면 직원과 상의한 뒤 그룹을 바꿔 승인하세요.</div>';
+    '<div class="tbl"><table class="grid"><thead><tr><th>' + (+ym.slice(5)) + '월</th><th class="num">승인 인원</th><th class="num">변경 요청</th><th class="num">평일 수</th><th class="num">1인당 별관 기회</th></tr></thead><tbody>' +
+      '<tr><td><b>홀수날 그룹</b></td><td class="num">' + eff.odd + '명</td><td class="num">' + req.odd + '명</td><td class="num">' + days.odd + '일</td><td class="num">' + per('odd') + '</td></tr>' +
+      '<tr><td><b>짝수날 그룹</b></td><td class="num">' + eff.even + '명</td><td class="num">' + req.even + '명</td><td class="num">' + days.even + '일</td><td class="num">' + per('even') + '</td></tr>' +
+      '<tr><td>차이</td><td class="num' + (unbalanced ? ' warn-cell' : '') + '">' + diff + '명</td><td colspan="3">' + (unbalanced ? '<span class="warn">한쪽에 몰려 있습니다</span>' : '균형 양호') + '</td></tr>' +
+    '</tbody></table></div>' +
+    '<div class="toolbar" style="margin:8px 0 0;"><span class="summary">승인 대기 <b>' + pending.length + '건</b></span>' +
+    (cu && pending.length ? '<button class="btn btn-primary" onclick="approveAllGroups()">요청대로 모두 승인</button>' : '') + '</div>' +
+    '<div class="note">별관은 그룹 날에만 쓸 수 있습니다(홀수날 = 홀수 그룹, 짝수날 = 짝수 그룹). 요청이 없는 사람은 지난달 그룹이 이어집니다. 한쪽에 몰리면 직원과 상의한 뒤 그룹을 바꿔 승인하세요.</div>';
   ids.sort(function (a, b) { return (pending.indexOf(b) >= 0 ? 1 : 0) - (pending.indexOf(a) >= 0 ? 1 : 0); });   // 승인 대기 먼저
-  document.getElementById('groupList').innerHTML = ids.map(function (u) {
+  var prev = P.addMonths(ym, -1) + '-15';
+  var rows = ids.map(function (u, i) {
     var p = _users[u], r = p.groupReq && p.groupReq[ym], a = p.groups && p.groups[ym], g = P.groupOf(p, key);
-    var state = a ? (r && r !== a ? '<span class="badge pin">요청 ' + P.groupName(r) + ' · 승인 대기</span>' : '<span class="badge">승인됨</span>')
-      : r ? '<span class="badge pin">요청 ' + P.groupName(r) + ' · 승인 대기</span>' : '<span class="badge">이어짐</span>';
-    return '<div class="user"><div><div class="u-name">' + esc(p.name) + '</div><div class="u-sub">' + P.groupName(g) + '날 ' + state + '</div></div>' +
-      '<div class="u-ctrl">' + (cu
-        ? '<button class="btn ' + (a === 'odd' ? 'btn-on' : '') + '" onclick="setGroup(\'' + u + '\',\'' + ym + '\',\'odd\')">홀수날 승인</button>' +
-          '<button class="btn ' + (a === 'even' ? 'btn-on' : '') + '" onclick="setGroup(\'' + u + '\',\'' + ym + '\',\'even\')">짝수날 승인</button>'
-        : '') + '</div></div>';
-  }).join('') || '<div class="empty">승인된 직원이 없습니다</div>';
+    var state = r && r !== a ? '<span class="badge pin">승인 대기</span>' : a ? '<span class="badge in">승인됨</span>' : '<span class="badge">이어짐</span>';
+    return '<tr' + (r && r !== a ? ' class="pending"' : '') + '><td class="num">' + (i + 1) + '</td><td><b>' + esc(p.name) + '</b></td>' +
+      '<td>' + P.groupName(P.groupOf(p, prev)) + '날</td><td>' + (r ? P.groupName(r) + '날' : '-') + '</td>' +
+      '<td><b>' + P.groupName(g) + '날</b></td><td>' + state + '</td>' +
+      (cu ? '<td class="acts"><button class="btn ' + (a === 'odd' ? 'btn-on' : '') + '" onclick="setGroup(\'' + u + '\',\'' + ym + '\',\'odd\')">홀수날</button>' +
+        '<button class="btn ' + (a === 'even' ? 'btn-on' : '') + '" onclick="setGroup(\'' + u + '\',\'' + ym + '\',\'even\')">짝수날</button></td>' : '') + '</tr>';
+  }).join('');
+  document.getElementById('groupList').innerHTML = rows
+    ? '<div class="tbl"><table class="grid"><thead><tr><th class="num">번호</th><th>이름</th><th>지난달</th><th>요청</th><th>' + (+ym.slice(5)) + '월 그룹</th><th>상태</th>' +
+      (cu ? '<th>승인</th>' : '') + '</tr></thead><tbody>' + rows + '</tbody></table></div>'
+    : '<div class="empty">승인된 직원이 없습니다</div>';
 }
 function setGroup(uid, ym, g) {
   _db.ref(P.ROOT + '/users/' + uid + '/groups/' + ym).set(g)
@@ -545,8 +567,11 @@ function approveAllGroups() {
 function shiftWeek(n) { _wk = P.addDays(_wk, n); watchWeek(); pushNav(); }
 function watchWeek() {
   _weekRefs.forEach(function (r) { r.off(); }); _weekRefs = [];
-  _week = null; _apps = {}; _draft = null;
+  _week = null; _apps = {}; _draft = null; _weekDays = {};
   on('weeks/' + _wk, function (v) { _week = v; renderWeek(); }, _weekRefs);
+  var dq = _db.ref(P.ROOT + '/days').orderByKey().startAt(_wk).endAt(P.addDays(_wk, 4));
+  dq.on('value', function (s) { _weekDays = s.val() || {}; renderWeek(); }, function () {});
+  _weekRefs.push(dq);
   on('apps/' + _wk, function (v) { _apps = v || {}; renderWeek(); }, _weekRefs);
   on('drafts/' + _wk, function (v) { _draft = v; renderWeek(); }, _weekRefs);
 }
@@ -558,14 +583,14 @@ function renderWeek() {
   var phase = !_week ? '일정 없음' : _week.publishedAt ? '발표됨' : t < sc.openAt ? '신청 전' : t < sc.closeAt ? '신청 중' : t < sc.publishAt ? '마감 · 배정 조정 중' : '발표 대기';
   var fri = P.addDays(_wk, -3);
   var nApp = Object.keys(_apps).length;
-  var perDay = dates.map(function (k) {
-    var n = Object.keys(_apps).filter(function (u) { return _apps[u].dates && _apps[u].dates[k]; }).length;
-    return P.shortLabel(k) + ' ' + n + '명';
-  }).join(' · ');
   document.getElementById('weekInfo').innerHTML =
-    '상태: <b>' + phase + '</b><br>' + P.label(fri) + ' ' + P.hm(sc.openAt) + ' 신청 시작 · ' + P.hm(sc.closeAt) + ' 마감 · ' + P.hm(sc.publishAt) + ' 발표' +
-    '<br>신청 ' + nApp + '명 · ' + (perDay || '신청일 없음') +
-    (_week && _week.publishedAt ? '<br>발표 ' + fmtTime(_week.publishedAt) + (_week.emailedAt ? ' · 메일 발송 ' + fmtTime(_week.emailedAt) : ' · 메일 발송 전') : '') +
+    '<div class="tbl"><table class="grid kv"><tbody>' +
+      '<tr><td>상태</td><td><b>' + phase + '</b></td></tr>' +
+      '<tr><td>신청 시간</td><td>' + P.label(fri) + ' ' + P.hm(sc.openAt) + ' ~ ' + P.hm(sc.closeAt) + '</td></tr>' +
+      '<tr><td>결과 발표</td><td>' + P.label(fri) + ' ' + P.hm(sc.publishAt) + (_week && _week.publishedAt ? ' (발표 ' + fmtTime(_week.publishedAt) + ')' : '') + '</td></tr>' +
+      '<tr><td>결과 메일</td><td>' + (_week && _week.emailedAt ? fmtTime(_week.emailedAt) + ' 발송' : '발송 전') + '</td></tr>' +
+      '<tr><td>신청 인원</td><td>' + nApp + '명</td></tr>' +
+    '</tbody></table></div>' +
     '<div class="note">마감(' + P.hm(sc.closeAt) + ') 직후 이용 횟수가 적은 순으로 배정안이 자동으로 만들어집니다. 발표 전까지 아래에서 조정할 수 있고, ' + P.hm(sc.publishAt) + '에 확정되어 메일이 나갑니다.</div>';
 
   var acts = '';
@@ -577,48 +602,68 @@ function renderWeek() {
   }
   document.getElementById('weekActions').innerHTML = acts;
 
+  // 날짜별 요약표 (신청 인원과 배정 결과)
+  var src = null;
+  if (_week && _week.publishedAt) { src = {}; Object.keys(_weekDays).forEach(function (k) { src[k] = (_weekDays[k] && _weekDays[k].seats) || {}; }); }
+  else if (_draft) src = _draft.days || {};
+  var summary = '<div class="tbl"><table class="grid"><thead><tr><th>날짜</th><th>그날</th><th class="num">신청</th><th class="num">별관</th><th class="num">남경</th><th class="num">대기</th></tr></thead><tbody>' +
+    dates.map(function (k) {
+      var n = Object.keys(_apps).filter(function (u) { return _apps[u].dates && _apps[u].dates[k]; }).length;
+      var c = { annex: '-', nam: '-', wait: '-' };
+      if (src && src[k]) { c = { annex: 0, nam: 0, wait: 0 }; Object.values(src[k]).forEach(function (s) { c[s.lot]++; }); }
+      return '<tr><td>' + P.label(k) + '</td><td>' + P.groupName(P.dayGroup(k)) + '날</td><td class="num">' + n + '명</td>' +
+        '<td class="num' + (c.annex > P.LOTS.annex.cap ? ' warn-cell' : '') + '">' + c.annex + (src ? ' / ' + P.LOTS.annex.cap : '') + '</td>' +
+        '<td class="num' + (c.nam > P.LOTS.nam.cap ? ' warn-cell' : '') + '">' + c.nam + (src ? ' / ' + P.LOTS.nam.cap : '') + '</td>' +
+        '<td class="num">' + c.wait + '</td></tr>';
+    }).join('') + '</tbody></table></div>';
+
   var box = document.getElementById('weekDraft');
   if (_week && _week.publishedAt) {
-    box.innerHTML = '<div class="summary">발표된 주입니다. 날짜별 반납·해제 처리는 <a href="#" onclick="openDay(\'' + dates[0] + '\');return false;">일자별</a> 탭에서 합니다.</div>';
+    box.innerHTML = summary +
+      '<div class="note">발표된 주입니다. 날짜별 결과와 반납·해제 처리는 <a href="#" onclick="openDay(\'' + dates[0] + '\');return false;">일자별</a> 탭에서 봅니다.</div>';
     return;
   }
   if (!_draft) {
-    box.innerHTML = '<div class="empty">' + (t < sc.closeAt ? '신청 마감 후 배정안이 만들어집니다.' : cd ? '배정안이 아직 없습니다. 위의 \'배정안 만들기\'를 누르세요.' : '배정안이 아직 없습니다.') + '</div>';
+    box.innerHTML = summary + '<div class="empty">' + (t < sc.closeAt ? '신청 마감 후 배정안이 만들어집니다.' : cd ? '배정안이 아직 없습니다. 위의 \'배정안 만들기\'를 누르세요.' : '배정안이 아직 없습니다.') + '</div>';
     return;
   }
   var pen = _draft.penalized || {};
-  box.innerHTML = '<div class="summary" style="margin-bottom:6px;">배정안 (' + fmtTime(_draft.createdAt) + ' 생성)' + (cd ? ' · 사람마다 별관/남경/대기를 바꿀 수 있습니다' : '') + '</div>' +
-    (Object.keys(pen).length ? '<div class="summary"><span class="warn">미도착 패널티로 제외: </span>' + Object.keys(pen).map(function (u) {
-      return esc((_users[u] || {}).name || '(삭제됨)') + ' (' + pen[u].map(P.shortLabel).join(', ') + ')';
-    }).join(', ') + '<div class="note">면제하려면 일자별 탭에서 해당 날짜의 \'패널티 면제\'를 누른 뒤 \'배정안 다시 만들기\'를 하세요.</div></div>' : '') +
+  box.innerHTML = '<div class="summary" style="margin-bottom:6px;">배정안 (' + fmtTime(_draft.createdAt) + ' 생성)' + (cd ? ' · 표의 \'변경\' 칸에서 별관/남경/대기를 바꿀 수 있습니다' : '') + '</div>' + summary +
+    (Object.keys(pen).length ? '<div class="lot-title"><span class="warn">미도착 패널티로 제외</span></div><div class="tbl"><table class="grid"><thead><tr><th>이름</th><th>미도착한 날</th></tr></thead><tbody>' +
+      Object.keys(pen).map(function (u) {
+        return '<tr><td>' + esc((_users[u] || {}).name || '(삭제됨)') + '</td><td>' + pen[u].map(P.shortLabel).join(', ') + '</td></tr>';
+      }).join('') + '</tbody></table></div><div class="note">면제하려면 일자별 탭에서 해당 날짜의 \'패널티 면제\'를 누른 뒤 \'배정안 다시 만들기\'를 하세요.</div>' : '') +
     dates.map(function (k) {
       var seats = (_draft.days && _draft.days[k]) || {};
-      return '<div class="day-block"><h4>' + P.label(k) + ' · ' + P.groupName(P.dayGroup(k)) + '날</h4>' + draftDay(k, seats, cd) + '</div>';
+      return '<div class="day-block"><h4>' + P.label(k) + ' · ' + P.groupName(P.dayGroup(k)) + '날 (별관은 ' + P.groupName(P.dayGroup(k)) + ' 그룹만)</h4>' + draftDay(k, seats, cd) + '</div>';
     }).join('');
 }
 function draftDay(k, seats, cd) {
-  var out = '';
+  var cols = cd ? 6 : 5;
+  var out = '<div class="tbl"><table class="grid"><thead><tr><th class="num">순번</th><th>이름</th><th>차량번호</th><th>그룹</th><th>비고</th>' + (cd ? '<th>변경</th>' : '') + '</tr></thead><tbody>';
   ['annex', 'nam', 'wait'].forEach(function (lot) {
     var list = Object.keys(seats).filter(function (u) { return seats[u].lot === lot; })
       .sort(function (a, b) { return (seats[a].order || 99) - (seats[b].order || 99); });
     var cap = P.LOTS[lot] && P.LOTS[lot].cap;
-    out += '<div class="lot-title ' + lot + '"><span>' + U.LOT_NAME[lot] + '</span><span class="' + (cap && list.length > cap ? 'over' : '') + '">' +
-      (cap ? list.length + ' / ' + cap : list.length + '명') + '</span></div>';
-    if (!list.length) out += '<div class="empty">없음</div>';
+    out += '<tr class="sec ' + lot + '"><td colspan="' + cols + '">' + U.LOT_NAME[lot] + ' · ' + (cap ? list.length + ' / ' + cap + '대' : list.length + '명') +
+      (cap && list.length > cap ? ' <span class="warn">(초과)</span>' : '') + '</td></tr>';
+    if (!list.length) out += '<tr><td colspan="' + cols + '" class="empty">없음</td></tr>';
     list.forEach(function (u, i) {
       var p = _users[u] || {};
-      var mine = p.priority ? '우선' : P.groupOf(p, k) === P.dayGroup(k) ? '그날 그룹' : '';
-      out += '<div class="row"><span class="no">' + (i + 1) + '</span><span class="nm">' + esc(p.name || '(삭제됨)') +
-        ' <span class="pl">' + esc(p.plate || '') + '</span></span>' + (mine ? '<span class="badge">' + mine + '</span>' : '') +
-        (cd ? '<select onchange="moveDraft(\'' + k + '\',\'' + u + '\',this.value)">' +
-          ['annex', 'nam', 'wait'].map(function (l) { return '<option value="' + l + '"' + (l === lot ? ' selected' : '') + '>' + U.LOT_NAME[l] + '</option>'; }).join('') +
-          '<option value="out">제외</option></select>' : '') + '</div>';
+      var note = [p.priority ? '우선 배정' : '', seats[u].moved ? '관리자 조정' : ''].filter(Boolean).join(', ');
+      var opts = ['annex', 'nam', 'wait'].filter(function (l) { return l !== 'annex' || P.annexOk(p, k); });
+      out += '<tr><td class="num">' + (i + 1) + '</td><td>' + esc(p.name || '(삭제됨)') + '</td><td>' + esc(p.plate || '') + '</td>' +
+        '<td>' + P.groupName(P.groupOf(p, k)) + '</td><td>' + (note || '') + '</td>' +
+        (cd ? '<td><select onchange="moveDraft(\'' + k + '\',\'' + u + '\',this.value)">' +
+          opts.map(function (l) { return '<option value="' + l + '"' + (l === lot ? ' selected' : '') + '>' + U.LOT_NAME[l] + '</option>'; }).join('') +
+          '<option value="out">제외</option></select></td>' : '') + '</tr>';
     });
   });
-  return out;
+  return out + '</tbody></table></div>';
 }
 function moveDraft(k, uid, lot) {
   var seats = (_draft.days && _draft.days[k]) || {};
+  if (lot === 'annex' && !P.annexOk(_users[uid], k)) { showToast('별관은 ' + P.groupName(P.dayGroup(k)) + ' 그룹만 배정할 수 있습니다'); renderWeek(); return; }
   var n = Object.keys(seats).filter(function (u) { return u !== uid && seats[u].lot === lot; }).length;
   if (P.LOTS[lot] && n >= P.LOTS[lot].cap && !confirm(U.LOT_NAME[lot] + '이 이미 ' + P.LOTS[lot].cap + '대로 찼습니다. 그래도 옮길까요?')) { renderWeek(); return; }
   var r = _db.ref(P.ROOT + '/drafts/' + _wk + '/days/' + k + '/' + uid);
@@ -672,7 +717,7 @@ function renderDay() {
     if (can('day') && key === P.today() && !_day.swept && P.now() >= P.releaseTime(key)) {
       info += ' <button class="btn btn-primary" onclick="runSweep()">9시 해제 실행</button>';
     }
-    board = U.boardHtml(_day, _users, { actions: can('day') ? dayActions : null });
+    board = U.boardHtml(_day, _users, { key: key, actions: can('day') ? dayActions : null });
   }
   document.getElementById('dayInfo').innerHTML = info;
   document.getElementById('dayBoard').innerHTML = board;
@@ -767,10 +812,12 @@ function renderHolidays() {
     var btns = !cd ? '' : off ? '<button class="btn" onclick="setHoliday(\'' + k + '\', null)">다시 휴일로</button>'
       : (base ? '<button class="btn btn-danger" onclick="setHoliday(\'' + k + '\', false)">휴일에서 빼기</button>'
               : '<button class="btn btn-danger" onclick="setHoliday(\'' + k + '\', null)">삭제</button>');
-    return '<div class="user"><div><div class="u-name"' + (off ? ' style="text-decoration:line-through;color:var(--text-muted)"' : '') + '>' +
-      P.label(k) + ' · ' + esc(name || '') + '</div><div class="u-sub">' + src + '</div></div><div class="u-ctrl">' + btns + '</div></div>';
+    return '<tr><td' + (off ? ' class="off"' : '') + '>' + P.label(k) + '</td><td' + (off ? ' class="off"' : '') + '>' + esc(name || '') + '</td>' +
+      '<td>' + src + '</td>' + (cd ? '<td class="acts">' + btns + '</td>' : '') + '</tr>';
   }).join('');
-  document.getElementById('holidayList').innerHTML = rows || '<div class="empty">앞으로 1년 안의 휴일이 없습니다</div>';
+  document.getElementById('holidayList').innerHTML = rows
+    ? '<div class="tbl"><table class="grid"><thead><tr><th>날짜</th><th>이름</th><th>구분</th>' + (cd ? '<th>처리</th>' : '') + '</tr></thead><tbody>' + rows + '</tbody></table></div>'
+    : '<div class="empty">앞으로 1년 안의 휴일이 없습니다</div>';
 }
 function setHoliday(k, v) { done(_db.ref(P.ROOT + '/holidays/' + k).set(v)); }
 function addHoliday() {
@@ -803,17 +850,21 @@ function renderAdmins() {
   var ids = Object.keys(_admins);
   document.getElementById('adminList').innerHTML =
     '<div class="lot-title"><span>지정된 관리자</span><span>' + ids.length + '명</span></div>' +
-    '<div class="user"><div><div class="u-name">' + esc(MASTER_NAME) + ' · 마스터</div><div class="u-sub">' + esc(MASTER_EMAIL) + '</div></div><div class="u-ctrl"><span class="badge">모든 권한</span></div></div>' +
+    '<div class="tbl"><table class="grid"><thead><tr><th>이름</th><th>이메일</th>' +
+      PERMS.map(function (p) { return '<th title="' + p.desc + '">' + p.name + '</th>'; }).join('') + '<th>처리</th></tr></thead><tbody>' +
+    '<tr><td><b>' + esc(MASTER_NAME) + '</b> (마스터)</td><td>' + esc(MASTER_EMAIL) + '</td>' +
+      PERMS.map(function () { return '<td>O</td>'; }).join('') + '<td>-</td></tr>' +
     ids.map(function (u) {
       var a = _admins[u], p = _users[u] || {};
-      return '<div class="user"><div><div class="u-name">' + esc(p.name || a.name) + '</div><div class="u-sub">' + esc(p.email || a.email) + '</div></div>' +
-        '<div class="u-ctrl">' + PERMS.map(function (pm) {
-          return '<label class="chk" title="' + pm.desc + '"><input type="checkbox"' + (a.perms && a.perms[pm.key] ? ' checked' : '') +
-            ' onchange="setPerm(\'' + u + '\',\'' + pm.key + '\',this.checked)" />' + pm.name + '</label>';
+      return '<tr><td><b>' + esc(p.name || a.name) + '</b></td><td>' + esc(p.email || a.email) + '</td>' +
+        PERMS.map(function (pm) {
+          return '<td><input type="checkbox"' + (a.perms && a.perms[pm.key] ? ' checked' : '') + ' onchange="setPerm(\'' + u + '\',\'' + pm.key + '\',this.checked)" /></td>';
         }).join('') +
-        '<button class="btn btn-danger" onclick="removeAdmin(\'' + u + '\')">해제</button></div></div>';
-    }).join('') +
-    '<div class="note">' + PERMS.map(function (p) { return '<b>' + p.name + '</b>: ' + p.desc; }).join('<br>') + '</div>';
+        '<td class="acts"><button class="btn btn-danger" onclick="removeAdmin(\'' + u + '\')">해제</button></td></tr>';
+    }).join('') + '</tbody></table></div>' +
+    '<div class="tbl" style="margin-top:10px;"><table class="grid kv"><thead><tr><th>권한</th><th>할 수 있는 일</th></tr></thead><tbody>' +
+      PERMS.map(function (p) { return '<tr><td>' + p.name + '</td><td style="white-space:normal">' + p.desc + '</td></tr>'; }).join('') +
+    '</tbody></table></div>';
 }
 function addAdmin() {
   var uid = document.getElementById('newAdmin').value;
