@@ -117,12 +117,16 @@ var ParkingUI = (function (P) {
     'table.grid.stack, table.grid.stack tbody, table.grid.stack tr, table.grid.stack td { display:block; width:100%; }' +
     'table.grid.stack { border:none; white-space:normal; }' +
     'table.grid.stack thead { display:none; }' +
-    // 카드 안은 두 칸으로 나눠 높이를 줄이고, 첫 칸(이름·날짜)과 처리 버튼은 한 줄 전체를 씀
-    'table.grid.stack td { min-width:0; overflow-wrap:anywhere; }' +   // 긴 이메일도 카드 안에서 줄바꿈
+    // 카드 안은 두 칸으로 나눠 높이를 줄이고, 제목(이름·날짜)·긴 값(이메일 등)·처리 버튼은 한 줄 전체를 씀
+    'table.grid.stack td { min-width:0; overflow-wrap:anywhere; }' +
     'table.grid.stack tr { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); column-gap:16px; border:1px solid var(--border); border-radius:10px; padding:8px 10px; margin-bottom:8px; background:var(--surface); }' +
     'table.grid.stack tr.sec { display:block; border:none; padding:10px 2px 2px; margin:0; background:none; }' +
-    'table.grid.stack td:first-child, table.grid.stack td.acts { grid-column:1 / -1; }' +
-    'table.grid.stack td:first-child { font-weight:700; font-size:14px; border-bottom:1px solid var(--border); padding-bottom:6px; margin-bottom:2px; }' +
+    'table.grid.stack td.ttl, table.grid.stack td.wide, table.grid.stack td.acts { grid-column:1 / -1; }' +
+    'table.grid.stack td.ttl { order:-1; font-weight:700; font-size:14.5px; border-bottom:1px solid var(--border); padding-bottom:6px; margin-bottom:2px; }' +
+    'table.grid.stack td.ttl::before { content:none; }' +
+    'table.grid.stack td.ttl { justify-content:flex-start; text-align:left; }' +
+    'table.grid.stack td.nolab { display:none; }' +
+    'table.grid.stack td.wide { order:1; } table.grid.stack td.acts { order:2; }' +   // 짧은 값끼리 두 칸씩 채운 뒤 긴 값, 마지막에 버튼
     'table.grid.stack td { display:flex; justify-content:space-between; align-items:center; gap:12px; border:none; padding:4px 0; text-align:right; white-space:normal; background:none; }' +
     'table.grid.stack td::before { content:attr(data-label); color:var(--text-muted); font-size:11.5px; font-weight:500; text-align:left; flex-shrink:0; }' +
     'table.grid.stack td:not([data-label])::before, table.grid.stack td[data-label=""]::before { content:none; }' +
@@ -132,15 +136,25 @@ var ParkingUI = (function (P) {
     'table.grid.stack tr.me td, table.grid.stack tr.pending td, table.grid.stack tr.pickrow.on td { background:none; }' +
     '.tbl:has(> table.grid.stack) { overflow:visible; }';
 
+  // class 를 바꿀 때만 손댐 (같은 값을 다시 넣어도 변경 감지가 일어나 무한 반복될 수 있어서)
+  function mark(el, cls, on) { if (el.classList.contains(cls) !== on) el.classList.toggle(cls, on); }
+  var NOT_TITLE = { '번호': 1, '순번': 1, '신청': 1 };
   function label(table) {
     var heads = [].map.call(table.querySelectorAll('thead th'), function (th) { return th.textContent.trim(); });
     if (!heads.length) return;
     [].forEach.call(table.querySelectorAll('tbody tr'), function (tr) {
       if (tr.classList.contains('sec')) return;
-      var i = 0;
+      var i = 0, titled = false;
       [].forEach.call(tr.children, function (td) {
-        if (!td.hasAttribute('colspan')) td.setAttribute('data-label', heads[i] || '');
-        i += +(td.getAttribute('colspan') || 1);
+        if (td.hasAttribute('colspan')) { i += +td.getAttribute('colspan'); return; }
+        var lab = heads[i] || '', text = td.textContent.trim();
+        td.setAttribute('data-label', lab);
+        var ttl = !titled && !NOT_TITLE[lab] && !td.classList.contains('acts');   // 카드 제목: 번호·순번·신청을 뺀 첫 칸
+        if (ttl) titled = true;
+        mark(td, 'ttl', ttl);
+        mark(td, 'nolab', lab === '번호');                                         // 의미 없는 일련번호는 카드에서 숨김
+        mark(td, 'wide', !ttl && (text.indexOf('@') >= 0 || text.length > 14));  // 긴 값은 한 줄 전체
+        i++;
       });
     });
   }
