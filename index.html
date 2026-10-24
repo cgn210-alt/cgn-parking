@@ -183,6 +183,7 @@
   <div class="card-box">
     <div class="box-title">승인 대기 중</div>
     <div class="box-sub">관리자가 등록 내용을 확인하고 있습니다. 승인되면 이 화면이 자동으로 바뀝니다.</div>
+    <div id="pendingMine"></div>
     <div id="pendingNotices"></div>
     <div class="link"><a onclick="doLogout()">로그아웃</a></div>
   </div>
@@ -271,7 +272,7 @@ window.addEventListener('load', function () {
     _meRef.on('value', function (s) {
       _me = s.val();
       if (!_me) { show('profileScreen'); return; }
-      if (!_me.approved) { show('pendingScreen'); stopMain(); renderNotices(); return; }
+      if (!_me.approved) { show('pendingScreen'); stopMain(); renderPending(); renderNotices(); return; }
       show('mainScreen');
       startMain();
     }, function () { show('pendingScreen'); });
@@ -633,7 +634,27 @@ function renderNotices() {
   var list = U.sortedNotices(_notices);
   var html = list.length ? list.map(function (n) { return U.noticeHtml(n); }).join('') : '<div class="empty">공지가 없습니다</div>';
   document.getElementById('noticeList').innerHTML = html;
-  document.getElementById('pendingNotices').innerHTML = list.length ? '<div class="card" style="text-align:left">' + html + '</div>' : '';
+  document.getElementById('pendingNotices').innerHTML = list.length
+    ? '<div class="section-title" style="text-align:left;margin-top:14px;">공지</div><div class="card" style="text-align:left">' + html + '</div>' : '';
+}
+
+// 승인 대기 화면: 본인이 등록·신청한 내용을 보여 줌
+function renderPending() {
+  if (!_me) return;
+  var d = _me.createdAt ? new Date(_me.createdAt + 9 * 3600000) : null;
+  var at = d ? d.getUTCFullYear() + '. ' + (d.getUTCMonth() + 1) + '. ' + d.getUTCDate() + '. ' + P.hm(_me.createdAt) : '-';
+  var row = function (k, v) { return '<tr><td style="color:var(--text-muted);width:96px;">' + k + '</td><td><b>' + v + '</b></td></tr>'; };
+  document.getElementById('pendingMine').innerHTML =
+    '<div class="section-title" style="text-align:left;">나의 신청 내용</div>' +
+    '<div class="tbl" style="text-align:left;margin-bottom:6px;"><table class="grid"><tbody>' +
+      row('이름', esc(_me.name)) +
+      row('차량번호', esc(_me.plate)) +
+      row('신청 그룹', P.groupName(_me.group) + '날 <span style="font-weight:400;color:var(--text-muted)">(그날 별관 이용)</span>') +
+      row('이메일', esc(_me.email || (_user && _user.email) || '')) +
+      row('신청 일시', at) +
+      row('상태', '<span class="tag wait">승인 대기</span>') +
+    '</tbody></table></div>' +
+    '<div class="note" style="text-align:left;">내용을 고쳐야 하면 관리자에게 알려 주세요. 승인 뒤에는 다음 달 그룹을 앱에서 바꿔 요청할 수 있습니다.</div>';
 }
 
 // ── 탭과 뒤로 가기 (주소 # 에 남겨서 휴대폰 뒤로 가기로 앞 화면에 돌아가게 함) ──
