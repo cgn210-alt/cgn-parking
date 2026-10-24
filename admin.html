@@ -111,6 +111,14 @@
     .toast { position:fixed; top:70px; left:50%; transform:translateX(-50%) translateY(-10px); background:#1a1916; color:#fff; font-size:13px; padding:10px 20px; border-radius:20px; opacity:0; transition:opacity 0.2s, transform 0.2s; z-index:100; pointer-events:none; }
     .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
     .hidden { display:none !important; }
+    .modal-bg { position:fixed; inset:0; background:rgba(26,25,22,0.45); display:flex; align-items:center; justify-content:center; padding:20px; z-index:50; }
+    .modal { background:var(--surface); border-radius:16px; width:100%; max-width:380px; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,0.18); }
+    .modal h3 { font-size:16px; margin-bottom:4px; }
+    .modal .m-sub { font-size:12.5px; color:var(--text-muted); margin-bottom:16px; word-break:break-all; }
+    .modal label { display:block; font-size:12px; color:var(--text-secondary); font-weight:500; margin:10px 0 4px; }
+    .modal .input { font-size:15px; padding:11px 12px; }
+    .modal .m-acts { display:flex; gap:8px; margin-top:18px; }
+    .modal .m-acts .btn { flex:1; padding:11px; font-size:14px; }
     @media (max-width:600px) {
       .btn { white-space:normal; max-width:100%; }
       .u-ctrl { width:100%; justify-content:flex-start; gap:5px; }
@@ -266,6 +274,22 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- 직원 정보 수정 창 -->
+<div class="modal-bg hidden" id="editModal" onclick="if(event.target===this)closeEdit()">
+  <div class="modal">
+    <h3>직원 정보 수정</h3>
+    <div class="m-sub" id="eEmail"></div>
+    <label for="eName">이름</label>
+    <input class="input" id="eName" />
+    <label for="ePlate">차량번호</label>
+    <input class="input" id="ePlate" placeholder="예: 12가 3456" onkeydown="if(event.key==='Enter')saveEdit()" />
+    <div class="m-acts">
+      <button class="btn" onclick="closeEdit()">취소</button>
+      <button class="btn btn-primary" onclick="saveEdit()">저장</button>
+    </div>
+  </div>
+</div>
 
 <script src="firebase-config.js?v=9"></script>
 <script src="parking-core.js?v=9"></script>
@@ -500,12 +524,22 @@ function approveUser(uid) {
   _db.ref(P.ROOT + '/users/' + uid).update(upd)
     .then(function () { showToast('승인했습니다 (' + (+ym.slice(5)) + '월 ' + P.groupName(_users[uid].group) + '날)'); }, function (e) { showToast('실패: ' + e.message); });
 }
+var _editUid = null;
 function editUser(uid) {
   var p = _users[uid];
-  var name = prompt('이름', p.name); if (name === null) return;
-  var plate = prompt('차량번호', p.plate); if (plate === null) return;
-  _db.ref(P.ROOT + '/users/' + uid).update({ name: name.trim() || p.name, plate: plate.trim() || p.plate })
-    .then(function () { showToast('저장했습니다'); });
+  _editUid = uid;
+  document.getElementById('eEmail').textContent = p.email || '';
+  document.getElementById('eName').value = p.name || '';
+  document.getElementById('ePlate').value = p.plate || '';
+  document.getElementById('editModal').classList.remove('hidden');
+  document.getElementById('eName').focus();
+}
+function closeEdit() { _editUid = null; document.getElementById('editModal').classList.add('hidden'); }
+function saveEdit() {
+  var name = document.getElementById('eName').value.trim(), plate = document.getElementById('ePlate').value.trim();
+  if (!name || !plate) { showToast('이름과 차량번호를 입력하세요'); return; }
+  _db.ref(P.ROOT + '/users/' + _editUid).update({ name: name, plate: plate })
+    .then(function () { closeEdit(); showToast('저장했습니다'); }, function (e) { showToast('저장 실패: ' + e.message); });
 }
 function deleteUser(uid) {
   if (!confirm(_users[uid].name + ' 님의 등록을 삭제할까요? 지난 기록에는 이름이 "삭제됨"으로 표시됩니다.')) return;
